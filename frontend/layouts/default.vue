@@ -25,11 +25,17 @@
             <v-divider v-if="item.divider" :key="index" class="mx-2"></v-divider>
             <v-list-item v-else :key="item.title" :to="item.to" exact>
               <v-list-item-avatar>
-                <v-icon v-text="item.icon"></v-icon>
+                <v-icon>
+                  {{ item.icon }}
+                </v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title v-text="item.title"></v-list-item-title>
-                <v-list-item-subtitle v-text="item.subtitle"></v-list-item-subtitle>
+                <v-list-item-title>
+                  {{ item.title }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.subtitle }}
+                </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -116,7 +122,7 @@ export default defineComponent({
           icon: this.$globals.icons.link,
           title: "Import",
           subtitle: "Import a recipe by URL",
-          to: "/recipe/create?tab=url",
+          to: "/recipe/create/url",
           restricted: true,
         },
         { divider: true },
@@ -124,7 +130,7 @@ export default defineComponent({
           icon: this.$globals.icons.edit,
           title: "Create",
           subtitle: "Create a recipe manually",
-          to: "/recipe/create?tab=new",
+          to: "/recipe/create/new",
           restricted: true,
         },
         { divider: true },

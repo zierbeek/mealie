@@ -1,14 +1,13 @@
-// @ts-ignore DOMPurify has no types
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import { useFraction } from "./use-fraction";
 import { RecipeIngredient } from "~/types/api-types/recipe";
 const { frac } = useFraction();
 
 function sanitizeIngredientHTML(rawHtml: string) {
   return DOMPurify.sanitize(rawHtml, {
-    "USE_PROFILES": {html: true},
-    "ALLOWED_TAGS": ["b", "q", "i", "strong", "sup"]
-  }) as string
+    USE_PROFILES: { html: true },
+    ALLOWED_TAGS: ["b", "q", "i", "strong", "sup"],
+  });
 }
 
 export function parseIngredientText(ingredient: RecipeIngredient, disableAmount: boolean, scale = 1): string {
@@ -19,7 +18,11 @@ export function parseIngredientText(ingredient: RecipeIngredient, disableAmount:
   const { quantity, food, unit, note } = ingredient;
 
   let returnQty = "";
-  if (quantity !== undefined && quantity !== 0) {
+
+  let unitDisplay = unit?.name;
+
+  // casting to number is required as sometimes quantity is a string
+  if (quantity && Number(quantity) !== 0) {
     if (unit?.fraction) {
       const fraction = frac(quantity * scale, 10, true);
       if (fraction[0] !== undefined && fraction[0] > 0) {
@@ -32,8 +35,12 @@ export function parseIngredientText(ingredient: RecipeIngredient, disableAmount:
     } else {
       returnQty = (quantity * scale).toString();
     }
+
+    if (unit?.useAbbreviation && unit.abbreviation) {
+      unitDisplay = unit.abbreviation;
+    }
   }
 
-  const text = `${returnQty} ${unit?.name || " "}  ${food?.name || " "} ${note || " "}`.replace(/ {2,}/g, " ");
+  const text = `${returnQty} ${unitDisplay || " "}  ${food?.name || " "} ${note || " "}`.replace(/ {2,}/g, " ");
   return sanitizeIngredientHTML(text);
 }

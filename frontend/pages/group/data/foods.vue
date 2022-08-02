@@ -40,7 +40,7 @@
         >
           <template #item="{ item }">
             <v-list-item-content>
-              <v-list-item-title v-text="item.name"></v-list-item-title>
+              <v-list-item-title> {{ item.name }} </v-list-item-title>
               <v-list-item-subtitle>
                 {{ item.progress }}% {{ $tc("language-dialog.translated") }}
               </v-list-item-subtitle>
@@ -48,11 +48,40 @@
           </template>
         </v-autocomplete>
 
-        <v-alert v-if="foods.length > 0" type="error" class="mb-0 text-body-2">
+        <v-alert v-if="foods && foods.length > 0" type="error" class="mb-0 text-body-2">
           {{ $t("data-pages.foods.seed-dialog-warning") }}
         </v-alert>
       </v-card-text>
     </BaseDialog>
+
+    <!-- Create Dialog -->
+    <BaseDialog
+      v-model="createDialog"
+      :icon="$globals.icons.foods"
+      title="Create Food"
+      :submit-text="$tc('general.save')"
+      @submit="createFood"
+    >
+      <v-card-text>
+        <v-form ref="domNewFoodForm">
+          <v-text-field
+            v-model="createTarget.name"
+            autofocus
+            label="Name"
+            :rules="[validators.required]"
+          ></v-text-field>
+          <v-text-field v-model="createTarget.description" label="Description"></v-text-field>
+          <v-autocomplete
+            v-model="createTarget.labelId"
+            clearable
+            :items="allLabels"
+            item-value="id"
+            item-text="name"
+            label="Food Label"
+          >
+          </v-autocomplete>
+        </v-form> </v-card-text
+    ></BaseDialog>
 
     <!-- Edit Dialog -->
     <BaseDialog
@@ -63,7 +92,7 @@
       @submit="editSaveFood"
     >
       <v-card-text v-if="editTarget">
-        <v-form ref="domCreateFoodForm">
+        <v-form ref="domNewFoodForm">
           <v-text-field v-model="editTarget.name" label="Name" :rules="[validators.required]"></v-text-field>
           <v-text-field v-model="editTarget.description" label="Description"></v-text-field>
           <v-autocomplete
@@ -96,12 +125,14 @@
     <CrudTable
       :table-config="tableConfig"
       :headers.sync="tableHeaders"
-      :data="foods"
+      :data="foods || []"
       :bulk-actions="[]"
       @delete-one="deleteEventHandler"
       @edit-one="editEventHandler"
+      @create-one="createEventHandler"
     >
       <template #button-row>
+        <BaseButton create @click="createDialog = true" />
         <BaseButton @click="mergeDialog = true">
           <template #icon> {{ $globals.icons.foods }} </template>
           Combine
@@ -128,10 +159,11 @@ import { computed } from "vue-demi";
 import type { LocaleObject } from "@nuxtjs/i18n";
 import { validators } from "~/composables/use-validators";
 import { useUserApi } from "~/composables/api";
-import { IngredientFood } from "~/types/api-types/recipe";
+import { CreateIngredientFood, IngredientFood } from "~/types/api-types/recipe";
 import MultiPurposeLabel from "~/components/Domain/ShoppingList/MultiPurposeLabel.vue";
-import { MultiPurposeLabelSummary } from "~/types/api-types/labels";
 import { useLocales } from "~/composables/use-locales";
+import { useFoodStore, useLabelStore } from "~/composables/store";
+import { VForm } from "~/types/vuetify";
 
 export default defineComponent({
   components: { MultiPurposeLabel },
@@ -163,32 +195,60 @@ export default defineComponent({
         show: true,
       },
     ];
-    const foods = ref<IngredientFood[]>([]);
-    async function refreshFoods() {
-      const { data } = await userApi.foods.getAll();
-      foods.value = data ?? [];
-    }
-    onMounted(() => {
-      refreshFoods();
+
+    const foodStore = useFoodStore();
+
+    // ===============================================================
+    // Food Creator
+
+    const domNewFoodForm = ref<VForm>();
+    const createDialog = ref(false);
+    const createTarget = ref<CreateIngredientFood>({
+      name: "",
     });
+
+    function createEventHandler() {
+      createDialog.value = true;
+    }
+
+    async function createFood() {
+      if (!createTarget.value || !createTarget.value.name) {
+        return;
+      }
+
+      // @ts-expect-error the createOne function erroneously expects an id because it uses the IngredientFood type
+      await foodStore.actions.createOne(createTarget.value);
+      createDialog.value = false;
+
+      domNewFoodForm.value?.reset();
+      createTarget.value = {
+        name: "",
+      };
+    }
+
+    // ===============================================================
+    // Food Editor
+
     const editDialog = ref(false);
     const editTarget = ref<IngredientFood | null>(null);
+
     function editEventHandler(item: IngredientFood) {
       editTarget.value = item;
       editDialog.value = true;
     }
+
     async function editSaveFood() {
       if (!editTarget.value) {
         return;
       }
 
-      const { data } = await userApi.foods.updateOne(editTarget.value.id, editTarget.value);
-      if (data) {
-        refreshFoods();
-      }
-
+      await foodStore.actions.updateOne(editTarget.value);
       editDialog.value = false;
     }
+
+    // ===============================================================
+    // Food Delete
+
     const deleteDialog = ref(false);
     const deleteTarget = ref<IngredientFood | null>(null);
     function deleteEventHandler(item: IngredientFood) {
@@ -200,10 +260,7 @@ export default defineComponent({
         return;
       }
 
-      const { data } = await userApi.foods.deleteOne(deleteTarget.value.id);
-      if (data) {
-        refreshFoods();
-      }
+      await foodStore.actions.deleteOne(deleteTarget.value.id);
       deleteDialog.value = false;
     }
 
@@ -226,19 +283,14 @@ export default defineComponent({
       const { data } = await userApi.foods.merge(fromFood.value.id, toFood.value.id);
 
       if (data) {
-        refreshFoods();
+        foodStore.actions.refresh();
       }
     }
 
     // ============================================================
     // Labels
 
-    const allLabels = ref([] as MultiPurposeLabelSummary[]);
-
-    async function refreshLabels() {
-      const { data } = await userApi.multiPurposeLabels.getAll();
-      allLabels.value = data ?? [];
-    }
+    const { labels: allLabels } = useLabelStore();
 
     // ============================================================
     // Seed
@@ -260,17 +312,21 @@ export default defineComponent({
       const { data } = await userApi.seeders.foods({ locale: locale.value });
 
       if (data) {
-        refreshFoods();
+        foodStore.actions.refresh();
       }
     }
 
-    refreshLabels();
     return {
       tableConfig,
       tableHeaders,
-      foods,
+      foods: foodStore.foods,
       allLabels,
       validators,
+      // Create
+      createDialog,
+      createEventHandler,
+      createFood,
+      createTarget,
       // Edit
       editDialog,
       editEventHandler,

@@ -18,7 +18,8 @@ class IngredientUnitModel(SqlAlchemyBase, BaseMixins):
     name = Column(String)
     description = Column(String)
     abbreviation = Column(String)
-    fraction = Column(Boolean)
+    use_abbreviation = Column(Boolean, default=False)
+    fraction = Column(Boolean, default=True)
     ingredients = orm.relationship("RecipeIngredient", back_populates="unit")
 
     @auto_init()

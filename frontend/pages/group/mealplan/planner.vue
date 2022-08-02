@@ -95,6 +95,7 @@
         <template v-if="edit">
           <draggable
             tag="div"
+            handle=".handle"
             :value="plan.meals"
             group="meals"
             :data-index="index"
@@ -102,7 +103,13 @@
             style="min-height: 150px"
             @end="onMoveCallback"
           >
-            <v-card v-for="mealplan in plan.meals" :key="mealplan.id" v-model="hover[mealplan.id]" class="my-1">
+            <v-card
+              v-for="mealplan in plan.meals"
+              :key="mealplan.id"
+              v-model="hover[mealplan.id]"
+              class="my-1"
+              :class="{ handle: $vuetify.breakpoint.smAndUp }"
+            >
               <v-list-item :to="edit || !mealplan.recipe ? null : `/recipe/${mealplan.recipe.slug}`">
                 <v-list-item-avatar :rounded="false">
                   <RecipeCardImage
@@ -126,7 +133,13 @@
                 </v-list-item-content>
               </v-list-item>
               <v-divider class="mx-2"></v-divider>
-              <div class="py-2 px-2 d-flex">
+              <div class="py-2 px-2 d-flex" style="align-items: center">
+                <v-btn small icon :class="{ handle: !$vuetify.breakpoint.smAndUp }">
+                  <v-icon>
+                    {{ $globals.icons.arrowUpDown }}
+                  </v-icon>
+                </v-btn>
+
                 <v-menu offset-y>
                   <template #activator="{ on, attrs }">
                     <v-chip v-bind="attrs" label small color="accent" v-on="on" @click.prevent>
@@ -146,8 +159,8 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-                <v-spacer></v-spacer>
-                <v-btn color="error" small icon @click="actions.deleteOne(mealplan.id)">
+
+                <v-btn class="ml-auto" small icon @click="actions.deleteOne(mealplan.id)">
                   <v-icon>{{ $globals.icons.delete }}</v-icon>
                 </v-btn>
               </div>
@@ -291,10 +304,12 @@ export default defineComponent({
     }
 
     function onMoveCallback(evt: SortableEvent) {
+      const supportedEvents = ["drop", "touchend"];
+
       // Adapted From https://github.com/SortableJS/Vue.Draggable/issues/1029
       const ogEvent: DragEvent = (evt as any).originalEvent;
 
-      if (ogEvent && ogEvent.type !== "drop") {
+      if (ogEvent && ogEvent.type in supportedEvents) {
         // The drop was cancelled, unsure if anything needs to be done?
         console.log("Cancel Move Event");
       } else {
@@ -346,7 +361,7 @@ export default defineComponent({
       date: "",
       title: "",
       text: "",
-      recipeId: undefined as number | undefined,
+      recipeId: undefined as string | undefined,
       entryType: "dinner" as PlanEntryType,
     });
 

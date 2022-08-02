@@ -1,7 +1,7 @@
 import { useAsync, ref, Ref } from "@nuxtjs/composition-api";
 import { useAsyncKey } from "./use-utils";
 import { useUserApi } from "~/composables/api";
-import { ReadCookBook, RecipeCookBook, UpdateCookBook } from "~/types/api-types/cookbook";
+import { ReadCookBook, UpdateCookBook } from "~/types/api-types/cookbook";
 
 let cookbookStore: Ref<ReadCookBook[] | null> | null = null;
 
@@ -31,7 +31,11 @@ export const useCookbooks = function () {
       const units = useAsync(async () => {
         const { data } = await api.cookbooks.getAll();
 
-        return data;
+        if (data) {
+          return data.items;
+        } else {
+          return null;
+        }
       }, useAsyncKey());
 
       loading.value = false;
@@ -41,8 +45,8 @@ export const useCookbooks = function () {
       loading.value = true;
       const { data } = await api.cookbooks.getAll();
 
-      if (data && cookbookStore) {
-        cookbookStore.value = data;
+      if (data && data.items && cookbookStore) {
+        cookbookStore.value = data.items;
       }
 
       loading.value = false;
@@ -66,7 +70,7 @@ export const useCookbooks = function () {
       }
 
       loading.value = true;
-      const { data } = await api.cookbooks.updateOne(updateData.id, updateData as RecipeCookBook);
+      const { data } = await api.cookbooks.updateOne(updateData.id, updateData);
       if (data && cookbookStore?.value) {
         this.refreshAll();
       }

@@ -5,7 +5,7 @@
         :buttons="[
           {
             icon: previewState ? $globals.icons.edit : $globals.icons.eye,
-            text: previewState ? $t('general.edit') : 'Preview Markdown',
+            text: previewState ? $tc('general.edit') : 'Preview Markdown',
             event: 'toggle',
           },
         ]"
@@ -14,28 +14,23 @@
     </div>
     <v-textarea
       v-if="!previewState"
+      v-bind="textarea"
       v-model="inputVal"
       :class="label == '' ? '' : 'mt-5'"
       :label="label"
       auto-grow
       dense
       rows="4"
-    ></v-textarea>
-    <VueMarkdown v-else :source="value"> </VueMarkdown>
+    />
+    <SafeMarkdown v-else :source="value" />
   </div>
 </template>
 
 <script lang="ts">
-// @ts-ignore vue-markdown has no types
-import VueMarkdown from "@adapttive/vue-markdown";
-
 import { defineComponent, computed, ref } from "@nuxtjs/composition-api";
 
 export default defineComponent({
   name: "MarkdownEditor",
-  components: {
-    VueMarkdown,
-  },
   props: {
     value: {
       type: String,
@@ -52,6 +47,10 @@ export default defineComponent({
     displayPreview: {
       type: Boolean,
       default: true,
+    },
+    textarea: {
+      type: Object,
+      default: () => ({}),
     },
   },
   setup(props, context) {
@@ -84,5 +83,3 @@ export default defineComponent({
   },
 });
 </script>
-
-

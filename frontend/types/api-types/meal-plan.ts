@@ -14,16 +14,16 @@ export interface Category {
   name: string;
   slug: string;
 }
-export interface CreatRandomEntry {
-  date: string;
-  entryType?: PlanEntryType & string;
-}
 export interface CreatePlanEntry {
   date: string;
   entryType?: PlanEntryType & string;
   title?: string;
   text?: string;
   recipeId?: string;
+}
+export interface CreateRandomEntry {
+  date: string;
+  entryType?: PlanEntryType & string;
 }
 export interface ListItem {
   title?: string;
@@ -148,6 +148,7 @@ export interface IngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
   id: string;
 }
 export interface CreateIngredientUnit {
@@ -155,6 +156,7 @@ export interface CreateIngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
 }
 export interface IngredientFood {
   name: string;

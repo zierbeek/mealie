@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import datetime
 import enum
 from typing import Optional, Union
 from uuid import UUID, uuid4
 
-from pydantic import UUID4, Field
+from pydantic import UUID4, Field, validator
 
 from mealie.schema._mealie import MealieModel
 from mealie.schema._mealie.types import NoneFloat
+from mealie.schema.response.pagination import PaginationBase
 
 
 class UnitFoodBase(MealieModel):
@@ -26,14 +28,21 @@ class SaveIngredientFood(CreateIngredientFood):
 class IngredientFood(CreateIngredientFood):
     id: UUID4
     label: Optional[MultiPurposeLabelSummary] = None
+    created_at: Optional[datetime.datetime]
+    update_at: Optional[datetime.datetime]
 
     class Config:
         orm_mode = True
 
 
+class IngredientFoodPagination(PaginationBase):
+    items: list[IngredientFood]
+
+
 class CreateIngredientUnit(UnitFoodBase):
     fraction: bool = True
     abbreviation: str = ""
+    use_abbreviation: bool = False
 
 
 class SaveIngredientUnit(CreateIngredientUnit):
@@ -42,9 +51,15 @@ class SaveIngredientUnit(CreateIngredientUnit):
 
 class IngredientUnit(CreateIngredientUnit):
     id: UUID4
+    created_at: Optional[datetime.datetime]
+    update_at: Optional[datetime.datetime]
 
     class Config:
         orm_mode = True
+
+
+class IngredientUnitPagination(PaginationBase):
+    items: list[IngredientUnit]
 
 
 class RecipeIngredient(MealieModel):
@@ -53,7 +68,7 @@ class RecipeIngredient(MealieModel):
     unit: Optional[Union[IngredientUnit, CreateIngredientUnit]]
     food: Optional[Union[IngredientFood, CreateIngredientFood]]
     disable_amount: bool = True
-    quantity: float = 1
+    quantity: NoneFloat = 1
     original_text: Optional[str]
 
     # Ref is used as a way to distinguish between an individual ingredient on the frontend
@@ -64,6 +79,20 @@ class RecipeIngredient(MealieModel):
     class Config:
         orm_mode = True
 
+    @validator("quantity", pre=True)
+    @classmethod
+    def validate_quantity(cls, value, values) -> NoneFloat:
+        """
+        Sometimes the frontend UI will provide an emptry string as a "null" value because of the default
+        bindings in Vue. This validator will ensure that the quantity is set to None if the value is an
+        empty string.
+        """
+        if isinstance(value, float):
+            return round(value, 3)
+        if value is None or value == "":
+            return None
+        return value
+
 
 class IngredientConfidence(MealieModel):
     average: NoneFloat = None
@@ -72,6 +101,15 @@ class IngredientConfidence(MealieModel):
     unit: NoneFloat = None
     quantity: NoneFloat = None
     food: NoneFloat = None
+
+    @validator("quantity", pre=True)
+    @classmethod
+    def validate_quantity(cls, value, values) -> NoneFloat:
+        if isinstance(value, float):
+            return round(value, 3)
+        if value is None or value == "":
+            return None
+        return value
 
 
 class ParsedIngredient(MealieModel):

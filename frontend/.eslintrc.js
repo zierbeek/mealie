@@ -1,5 +1,8 @@
 module.exports = {
   root: true,
+  settings: {
+    "import/ignore": ["@vueuse*"],
+  },
   env: {
     browser: true,
     node: true,
@@ -35,6 +38,7 @@ module.exports = {
     "vue/singleline-html-element-content-newline": "off",
     "vue/multiline-html-element-content-newline": "off",
     "vue/no-mutating-props": "off",
+    "vue/no-v-text-v-html-on-component": "warn",
     "vue/no-v-for-template-key-on-child": "off",
     "vue/valid-v-slot": [
       "error",
@@ -48,6 +52,8 @@ module.exports = {
         "ts-ignore": "allow-with-description",
       },
     ],
+    "no-restricted-imports": ["error", { paths: ["@vue/reactivity", "@vue/runtime-dom", "@vue/composition-api"] }],
+
     // TODO Gradually activate all rules
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",

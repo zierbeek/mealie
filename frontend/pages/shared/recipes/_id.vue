@@ -17,7 +17,7 @@
               <RecipeRating :key="recipe.slug" :value="recipe.rating" :name="recipe.name" :slug="recipe.slug" />
             </v-card-title>
             <v-divider class="my-2"></v-divider>
-            <VueMarkdown :source="recipe.description"> </VueMarkdown>
+            <SafeMarkdown :source="recipe.description"> </SafeMarkdown>
             <v-divider></v-divider>
             <div class="d-flex justify-center mt-5">
               <RecipeTimeCard
@@ -34,7 +34,7 @@
           :key="imageKey"
           :max-width="enableLandscape ? null : '50%'"
           :height="hideImage ? '50' : imageHeight"
-          :src="recipeImage(recipe.slug, imageKey)"
+          :src="recipeImage(recipe.id, recipe.image, imageKey)"
           class="d-print-none"
           @error="hideImage = true"
         >
@@ -61,7 +61,7 @@
             <v-card-title class="pa-0 ma-0 headline">
               {{ recipe.name }}
             </v-card-title>
-            <VueMarkdown :source="recipe.description"> </VueMarkdown>
+            <SafeMarkdown :source="recipe.description"> </SafeMarkdown>
           </template>
 
           <template v-else-if="form">
@@ -197,6 +197,9 @@
                 :disable-amount="recipe.settings.disableAmount"
                 :edit="form"
                 public
+                :assets="recipe.assets"
+                :recipe-id="recipe.id"
+                :recipe-slug="recipe.slug"
               />
 
               <!-- TODO: Somehow fix duplicate code for mobile/desktop -->
@@ -270,8 +273,6 @@ import {
   useMeta,
   useRoute,
 } from "@nuxtjs/composition-api";
-// @ts-ignore vue-markdown has no types
-import VueMarkdown from "@adapttive/vue-markdown";
 // import { useRecipeMeta } from "~/composables/recipes";
 import { useStaticRoutes, useUserApi } from "~/composables/api";
 import RecipeChips from "~/components/Domain/Recipe/RecipeChips.vue";
@@ -293,7 +294,6 @@ export default defineComponent({
     RecipePrintView,
     RecipeRating,
     RecipeTimeCard,
-    VueMarkdown,
   },
   layout: "basic",
   setup() {
@@ -323,7 +323,6 @@ export default defineComponent({
       const { data } = await api.recipes.getShared(id);
       if (data) {
         if (data && data !== undefined) {
-          console.log("Computed Meta. RefKey=");
           const imageURL = data.id ? recipeImage(data.id) : undefined;
           title.value = data.name;
 

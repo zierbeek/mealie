@@ -20,6 +20,7 @@
           class="mx-1"
           type="number"
           placeholder="Quantity"
+          @keypress="quantityFilter"
         >
           <v-icon v-if="$listeners && $listeners.delete" slot="prepend" class="mr-n1 handle">
             {{ $globals.icons.arrowUpDown }}
@@ -117,7 +118,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs } from "@nuxtjs/composition-api";
-import { useFoods, useUnits } from "~/composables/recipes";
+import { useFoodStore, useFoodData, useUnitStore, useUnitData } from "~/composables/store";
 import { validators } from "~/composables/use-validators";
 import { RecipeIngredient } from "~/types/api-types/recipe";
 
@@ -133,28 +134,30 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { value } = props;
-
     // ==================================================
     // Foods
-    const { foods, workingFoodData, actions: foodActions } = useFoods();
+    const foodStore = useFoodStore();
+    const foodData = useFoodData();
     const foodSearch = ref("");
 
     async function createAssignFood() {
-      workingFoodData.name = foodSearch.value;
-      await foodActions.createOne();
-      value.food = foods.value?.find((food) => food.name === foodSearch.value);
+      foodData.data.name = foodSearch.value;
+      await foodStore.actions.createOne(foodData.data);
+      props.value.food = foodStore.foods.value?.find((food) => food.name === foodSearch.value);
+      foodData.reset();
     }
 
     // ==================================================
     // Units
-    const { units, workingUnitData, actions: unitActions } = useUnits();
+    const unitStore = useUnitStore();
+    const unitsData = useUnitData();
     const unitSearch = ref("");
 
     async function createAssignUnit() {
-      workingUnitData.name = unitSearch.value;
-      await unitActions.createOne();
-      value.unit = units.value?.find((unit) => unit.name === unitSearch.value);
+      unitsData.data.name = unitSearch.value;
+      await unitStore.actions.createOne(unitsData.data);
+      props.value.unit = unitStore.units.value?.find((unit) => unit.name === unitSearch.value);
+      unitsData.reset();
     }
 
     const state = reactive({
@@ -163,13 +166,10 @@ export default defineComponent({
     });
 
     function toggleTitle() {
-      if (value.title) {
-        state.showTitle = false;
-        value.title = "";
-      } else {
-        state.showTitle = true;
-        value.title = "Section Title";
+      if (state.showTitle) {
+        props.value.title = "";
       }
+      state.showTitle = !state.showTitle;
     }
 
     function toggleOriginalText() {
@@ -177,13 +177,21 @@ export default defineComponent({
     }
 
     function handleUnitEnter() {
-      if (value.unit === undefined || value.unit === null || !value.unit.name.includes(unitSearch.value)) {
+      if (
+        props.value.unit === undefined ||
+        props.value.unit === null ||
+        !props.value.unit.name.includes(unitSearch.value)
+      ) {
         createAssignUnit();
       }
     }
 
     function handleFoodEnter() {
-      if (value.food === undefined || value.food === null || !value.food.name.includes(foodSearch.value)) {
+      if (
+        props.value.food === undefined ||
+        props.value.food === null ||
+        !props.value.food.name.includes(foodSearch.value)
+      ) {
         createAssignFood();
       }
     }
@@ -204,7 +212,7 @@ export default defineComponent({
       //   });
       // }
 
-      if (value.originalText) {
+      if (props.value.originalText) {
         options.push({
           text: "See Original Text",
           event: "toggle-original",
@@ -214,22 +222,30 @@ export default defineComponent({
       return options;
     });
 
+    function quantityFilter(e: KeyboardEvent) {
+      // if digit is pressed, add to quantity
+      if (e.key === "-" || e.key === "+" || e.key === "e") {
+        e.preventDefault();
+      }
+    }
+
     return {
+      ...toRefs(state),
+      quantityFilter,
       toggleOriginalText,
       contextMenuOptions,
       handleUnitEnter,
       handleFoodEnter,
-      ...toRefs(state),
       createAssignFood,
       createAssignUnit,
-      foods,
+      foods: foodStore.foods,
       foodSearch,
       toggleTitle,
-      unitActions,
-      units,
+      unitActions: unitStore.actions,
+      units: unitStore.units,
       unitSearch,
       validators,
-      workingUnitData,
+      workingUnitData: unitsData.data,
     };
   },
 });

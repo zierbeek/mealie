@@ -78,6 +78,14 @@ export interface Icon {
   shareVariant: string;
   shuffleVariant: string;
   sort: string;
+  sortAscending: string;
+  sortDescending: string;
+  sortAlphabeticalAscending: string;
+  sortAlphabeticalDescending: string;
+  sortCalendarAscending: string;
+  sortCalendarDescending: string;
+  sortClockAscending: string;
+  sortClockDescending: string;
   star: string;
   testTube: string;
   tools: string;
@@ -90,6 +98,7 @@ export interface Icon {
   webhook: string;
   windowClose: string;
   zip: string;
+  undo: string;
 
   // Crud
   backArrow: string;

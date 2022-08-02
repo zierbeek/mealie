@@ -6,12 +6,19 @@ from pydantic import UUID4
 from mealie.routes._base.base_controllers import BaseUserController
 from mealie.routes._base.controller import controller
 from mealie.routes._base.mixins import HttpRepo
+from mealie.routes._base.routers import MealieCrudRoute
 from mealie.schema import mapper
-from mealie.schema.query import GetAll
-from mealie.schema.recipe.recipe_ingredient import CreateIngredientUnit, IngredientUnit, MergeUnit, SaveIngredientUnit
+from mealie.schema.recipe.recipe_ingredient import (
+    CreateIngredientUnit,
+    IngredientUnit,
+    IngredientUnitPagination,
+    MergeUnit,
+    SaveIngredientUnit,
+)
+from mealie.schema.response.pagination import PaginationQuery
 from mealie.schema.response.responses import SuccessResponse
 
-router = APIRouter(prefix="/units", tags=["Recipes: Units"])
+router = APIRouter(prefix="/units", tags=["Recipes: Units"], route_class=MealieCrudRoute)
 
 
 @controller(router)
@@ -37,9 +44,15 @@ class IngredientUnitsController(BaseUserController):
             self.deps.logger.error(e)
             raise HTTPException(500, "Failed to merge units") from e
 
-    @router.get("", response_model=list[IngredientUnit])
-    def get_all(self, q: GetAll = Depends(GetAll)):
-        return self.repo.get_all(start=q.start, limit=q.limit)
+    @router.get("", response_model=IngredientUnitPagination)
+    def get_all(self, q: PaginationQuery = Depends(PaginationQuery)):
+        response = self.repo.page_all(
+            pagination=q,
+            override=IngredientUnit,
+        )
+
+        response.set_pagination_guides(router.url_path_for("get_all"), q.dict())
+        return response
 
     @router.post("", response_model=IngredientUnit, status_code=201)
     def create_one(self, data: CreateIngredientUnit):

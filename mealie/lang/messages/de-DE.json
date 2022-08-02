@@ -11,5 +11,12 @@
         "integrity-error": "Datenbankintegritätsfehler",
         "username-conflict-error": "Dieser Benutzername ist bereits vergeben",
         "email-conflict-error": "Diese E-Mail-Adresse wird bereits verwendet"
+    },
+    "notifications": {
+        "generic-created": "{name} wurde erstellt",
+        "generic-updated": "{name} wurde aktualisiert",
+        "generic-created-with-url": "{name} wurde erstellt, {url}",
+        "generic-updated-with-url": "{name} wurde aktualisiert, {url}",
+        "generic-deleted": "{name} wurde gelöscht"
     }
 }

@@ -12,14 +12,15 @@ from mealie.schema.group.group_shopping_list import (
     ShoppingListItemOut,
     ShoppingListItemUpdate,
     ShoppingListOut,
+    ShoppingListPagination,
     ShoppingListSave,
     ShoppingListSummary,
     ShoppingListUpdate,
 )
 from mealie.schema.mapper import cast
-from mealie.schema.query import GetAll
+from mealie.schema.response.pagination import PaginationQuery
 from mealie.schema.response.responses import SuccessResponse
-from mealie.services.event_bus_service.event_bus_service import EventBusService
+from mealie.services.event_bus_service.event_bus_service import EventBusService, EventSource
 from mealie.services.event_bus_service.message_types import EventTypes
 from mealie.services.group_services.shopping_lists import ShoppingListService
 
@@ -28,6 +29,9 @@ item_router = APIRouter(prefix="/groups/shopping/items", tags=["Group: Shopping 
 
 @controller(item_router)
 class ShoppingListItemController(BaseUserController):
+
+    event_bus: EventBusService = Depends(EventBusService)
+
     @cached_property
     def service(self):
         return ShoppingListService(self.repos)
@@ -72,7 +76,25 @@ class ShoppingListItemController(BaseUserController):
 
     @item_router.post("", response_model=ShoppingListItemOut, status_code=201)
     def create_one(self, data: ShoppingListItemCreate):
-        return self.mixins.create_one(data)
+        shopping_list_item = self.mixins.create_one(data)
+
+        if shopping_list_item:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_updated,
+                msg=self.t(
+                    "notifications.generic-created",
+                    name=f"An item on shopping list {shopping_list_item.shopping_list_id}",
+                ),
+                event_source=EventSource(
+                    event_type="create",
+                    item_type="shopping-list-item",
+                    item_id=shopping_list_item.id,
+                    shopping_list_id=shopping_list_item.shopping_list_id,
+                ),
+            )
+
+        return shopping_list_item
 
     @item_router.get("/{item_id}", response_model=ShoppingListItemOut)
     def get_one(self, item_id: UUID4):
@@ -80,11 +102,47 @@ class ShoppingListItemController(BaseUserController):
 
     @item_router.put("/{item_id}", response_model=ShoppingListItemOut)
     def update_one(self, item_id: UUID4, data: ShoppingListItemUpdate):
-        return self.mixins.update_one(data, item_id)
+        shopping_list_item = self.mixins.update_one(data, item_id)
+
+        if shopping_list_item:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_updated,
+                msg=self.t(
+                    "notifications.generic-updated",
+                    name=f"An item on shopping list {shopping_list_item.shopping_list_id}",
+                ),
+                event_source=EventSource(
+                    event_type="update",
+                    item_type="shopping-list-item",
+                    item_id=shopping_list_item.id,
+                    shopping_list_id=shopping_list_item.shopping_list_id,
+                ),
+            )
+
+        return shopping_list_item
 
     @item_router.delete("/{item_id}", response_model=ShoppingListItemOut)
     def delete_one(self, item_id: UUID4):
-        return self.mixins.delete_one(item_id)  # type: ignore
+        shopping_list_item = self.mixins.delete_one(item_id)  # type: ignore
+
+        if shopping_list_item:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_updated,
+                msg=self.t(
+                    "notifications.generic-deleted",
+                    name=f"An item on shopping list {shopping_list_item.shopping_list_id}",
+                ),
+                event_source=EventSource(
+                    event_type="delete",
+                    item_type="shopping-list-item",
+                    item_id=shopping_list_item.id,
+                    shopping_list_id=shopping_list_item.shopping_list_id,
+                ),
+            )
+
+        return shopping_list_item
 
 
 router = APIRouter(prefix="/groups/shopping/lists", tags=["Group: Shopping Lists"])
@@ -106,12 +164,18 @@ class ShoppingListController(BaseUserController):
     # CRUD Operations
 
     @cached_property
-    def mixins(self) -> HttpRepo:
+    def mixins(self) -> HttpRepo[ShoppingListCreate, ShoppingListOut, ShoppingListSave]:
         return HttpRepo(self.repo, self.deps.logger, self.registered_exceptions, "An unexpected error occurred.")
 
-    @router.get("", response_model=list[ShoppingListSummary])
-    def get_all(self, q: GetAll = Depends(GetAll)):
-        return self.repo.get_all(start=q.start, limit=q.limit, override_schema=ShoppingListSummary)
+    @router.get("", response_model=ShoppingListPagination)
+    def get_all(self, q: PaginationQuery = Depends(PaginationQuery)):
+        response = self.repo.page_all(
+            pagination=q,
+            override=ShoppingListSummary,
+        )
+
+        response.set_pagination_guides(router.url_path_for("get_all"), q.dict())
+        return response
 
     @router.post("", response_model=ShoppingListOut, status_code=201)
     def create_one(self, data: ShoppingListCreate):
@@ -122,7 +186,12 @@ class ShoppingListController(BaseUserController):
             self.event_bus.dispatch(
                 self.deps.acting_user.group_id,
                 EventTypes.shopping_list_created,
-                msg="A new shopping list has been created.",
+                msg=self.t("notifications.generic-created", name=val.name),
+                event_source=EventSource(
+                    event_type="create",
+                    item_type="shopping-list",
+                    item_id=val.id,
+                ),
             )
 
         return val
@@ -133,19 +202,75 @@ class ShoppingListController(BaseUserController):
 
     @router.put("/{item_id}", response_model=ShoppingListOut)
     def update_one(self, item_id: UUID4, data: ShoppingListUpdate):
-        return self.mixins.update_one(data, item_id)
+        data = self.mixins.update_one(data, item_id)  # type: ignore
+        if data:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_updated,
+                msg=self.t("notifications.generic-updated", name=data.name),
+                event_source=EventSource(
+                    event_type="update",
+                    item_type="shopping-list",
+                    item_id=data.id,
+                ),
+            )
+        return data
 
     @router.delete("/{item_id}", response_model=ShoppingListOut)
     def delete_one(self, item_id: UUID4):
-        return self.mixins.delete_one(item_id)  # type: ignore
+        data = self.mixins.delete_one(item_id)  # type: ignore
+        if data:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_deleted,
+                msg=self.t("notifications.generic-deleted", name=data.name),
+                event_source=EventSource(
+                    event_type="delete",
+                    item_type="shopping-list",
+                    item_id=data.id,
+                ),
+            )
+        return data
 
     # =======================================================================
     # Other Operations
 
     @router.post("/{item_id}/recipe/{recipe_id}", response_model=ShoppingListOut)
     def add_recipe_ingredients_to_list(self, item_id: UUID4, recipe_id: UUID4):
-        return self.service.add_recipe_ingredients_to_list(item_id, recipe_id)
+        shopping_list = self.service.add_recipe_ingredients_to_list(item_id, recipe_id)
+        if shopping_list:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_updated,
+                msg=self.t(
+                    "notifications.generic-updated",
+                    name=shopping_list.name,
+                ),
+                event_source=EventSource(
+                    event_type="bulk-updated-items",
+                    item_type="shopping-list",
+                    item_id=shopping_list.id,
+                ),
+            )
+
+        return shopping_list
 
     @router.delete("/{item_id}/recipe/{recipe_id}", response_model=ShoppingListOut)
     def remove_recipe_ingredients_from_list(self, item_id: UUID4, recipe_id: UUID4):
-        return self.service.remove_recipe_ingredients_from_list(item_id, recipe_id)
+        shopping_list = self.service.remove_recipe_ingredients_from_list(item_id, recipe_id)
+        if shopping_list:
+            self.event_bus.dispatch(
+                self.deps.acting_user.group_id,
+                EventTypes.shopping_list_updated,
+                msg=self.t(
+                    "notifications.generic-updated",
+                    name=shopping_list.name,
+                ),
+                event_source=EventSource(
+                    event_type="bulk-updated-items",
+                    item_type="shopping-list",
+                    item_id=shopping_list.id,
+                ),
+            )
+
+        return shopping_list

@@ -50,10 +50,10 @@ export interface BackupOptions {
   notifications?: boolean;
 }
 export interface CheckAppConfig {
-  emailReady?: boolean;
-  ldapReady?: boolean;
-  baseUrlSet?: boolean;
-  isUpToDate?: boolean;
+  emailReady: boolean;
+  ldapReady: boolean;
+  baseUrlSet: boolean;
+  isUpToDate: boolean;
 }
 export interface ChowdownURL {
   url: string;
@@ -133,6 +133,7 @@ export interface IngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
   id: string;
 }
 export interface CreateIngredientUnit {
@@ -140,6 +141,7 @@ export interface CreateIngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
 }
 export interface IngredientFood {
   name: string;
@@ -173,6 +175,16 @@ export interface CustomPageOut {
 }
 export interface DockerVolumeText {
   text: string;
+}
+export interface EmailReady {
+  ready: boolean;
+}
+export interface EmailSuccess {
+  success: boolean;
+  error?: string;
+}
+export interface EmailTest {
+  email: string;
 }
 export interface GroupImport {
   name: string;

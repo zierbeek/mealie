@@ -58,13 +58,13 @@
       </v-card>
     </v-dialog>
 
-    <div class="d-flex justify-space-between justify-start">
+    <div v-if="showCookMode" class="d-flex justify-space-between justify-start">
       <h2 class="mb-4 mt-1">{{ $t("recipe.instructions") }}</h2>
-      <BaseButton v-if="!public" minor :to="$router.currentRoute.path + '/cook'" cancel color="primary">
+      <BaseButton v-if="!public && !edit" minor cancel color="primary" @click="toggleCookMode()">
         <template #icon>
           {{ $globals.icons.primary }}
         </template>
-        Cook
+        Cook Mode
       </BaseButton>
     </div>
     <draggable
@@ -92,7 +92,7 @@
             @click="toggleCollapseSection(index)"
           >
             <v-toolbar-title v-if="!edit" class="headline">
-              <v-app-bar-title v-text="step.title"> </v-app-bar-title>
+              <v-app-bar-title> {{ step.title }} </v-app-bar-title>
             </v-toolbar-title>
             <v-text-field
               v-if="edit"
@@ -168,12 +168,26 @@
                   </v-icon>
                 </v-fade-transition>
               </v-card-title>
-              <v-card-text v-if="edit">
+
+              <!-- Content -->
+              <v-card-text
+                v-if="edit"
+                :class="{
+                  blur: imageUploadMode,
+                }"
+                @drop.stop.prevent="handleImageDrop(index, $event)"
+              >
                 <MarkdownEditor
                   v-model="value[index]['text']"
+                  class="mb-2"
                   :preview.sync="previewStates[index]"
                   :display-preview="false"
+                  :textarea="{
+                    hint: 'Attach images by dragging & dropping them into the editor',
+                    persistentHint: true,
+                  }"
                 />
+
                 <div
                   v-for="ing in step.ingredientReferences"
                   :key="ing.referenceId"
@@ -183,7 +197,15 @@
               <v-expand-transition>
                 <div v-show="!isChecked(index) && !edit" class="m-0 p-0">
                   <v-card-text class="markdown">
-                    <VueMarkdown class="markdown" :source="step.text"> </VueMarkdown>
+                    <SafeMarkdown class="markdown" :source="step.text" />
+                    <div v-if="cookMode && step.ingredientReferences && step.ingredientReferences.length > 0">
+                      <v-divider class="mb-2"></v-divider>
+                      <div
+                        v-for="ing in step.ingredientReferences"
+                        :key="ing.referenceId"
+                        v-html="getIngredientByRefId(ing.referenceId)"
+                      />
+                    </div>
                   </v-card-text>
                 </div>
               </v-expand-transition>
@@ -197,12 +219,20 @@
 
 <script lang="ts">
 import draggable from "vuedraggable";
-// @ts-ignore vue-markdown has no types
-import VueMarkdown from "@adapttive/vue-markdown";
-import { ref, toRefs, reactive, defineComponent, watch, onMounted } from "@nuxtjs/composition-api";
-import { RecipeStep, IngredientReferences, RecipeIngredient } from "~/types/api-types/recipe";
+import {
+  ref,
+  toRefs,
+  reactive,
+  defineComponent,
+  watch,
+  onMounted,
+  useContext,
+  computed,
+} from "@nuxtjs/composition-api";
+import { RecipeStep, IngredientReferences, RecipeIngredient, RecipeAsset } from "~/types/api-types/recipe";
 import { parseIngredientText } from "~/composables/recipes";
-import { uuid4 } from "~/composables/use-utils";
+import { uuid4, detectServerBaseUrl } from "~/composables/use-utils";
+import { useUserApi, useStaticRoutes } from "~/composables/api";
 
 interface MergerHistory {
   target: number;
@@ -213,7 +243,6 @@ interface MergerHistory {
 
 export default defineComponent({
   components: {
-    VueMarkdown,
     draggable,
   },
   props: {
@@ -237,9 +266,34 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    recipeId: {
+      type: String,
+      default: "",
+    },
+    recipeSlug: {
+      type: String,
+      default: "",
+    },
+    assets: {
+      type: Array as () => RecipeAsset[],
+      required: true,
+    },
+    cookMode: {
+      type: Boolean,
+      default: false,
+    },
+    scale: {
+      type: Number,
+      default: 1,
+    },
   },
 
   setup(props, context) {
+    const { req } = useContext();
+    const BASE_URL = detectServerBaseUrl(req);
+
+    console.log("Base URL", BASE_URL);
+
     const state = reactive({
       dialog: false,
       disabledSteps: [] as number[],
@@ -274,18 +328,25 @@ export default defineComponent({
     watch(props.value, (v) => {
       state.disabledSteps = [];
 
-      v.forEach((element) => {
+      v.forEach((element: RecipeStep) => {
         if (element.id !== undefined) {
           showTitleEditor.value[element.id] = validateTitle(element.title);
         }
       });
     });
 
+    const showCookMode = ref(false);
+
     // Eliminate state with an eager call to watcher?
     onMounted(() => {
-      props.value.forEach((element) => {
+      props.value.forEach((element: RecipeStep) => {
         if (element.id !== undefined) {
           showTitleEditor.value[element.id] = validateTitle(element.title);
+        }
+
+        // showCookMode.value = false;
+        if (showCookMode.value === false && element.ingredientReferences && element.ingredientReferences.length > 0) {
+          showCookMode.value = true;
         }
 
         showTitleEditor.value = { ...showTitleEditor.value };
@@ -344,6 +405,14 @@ export default defineComponent({
           referenceId: ref,
         };
       });
+
+      // Update the visibility of the cook mode button
+      showCookMode.value = false;
+      props.value.forEach((element) => {
+        if (showCookMode.value === false && element.ingredientReferences && element.ingredientReferences.length > 0) {
+          showCookMode.value = true;
+        }
+      });
       state.dialog = false;
     }
 
@@ -368,7 +437,7 @@ export default defineComponent({
     }
 
     function autoSetReferences() {
-      // Ingore matching blacklisted words when auto-linking - This is kind of a cludgey implementation. We're blacklisting common words but
+      // Ignore matching blacklisted words when auto-linking - This is kind of a cludgey implementation. We're blacklisting common words but
       // other common phrases trigger false positives and I'm not sure how else to approach this. In the future I maybe look at looking directly
       // at the food variable and seeing if the food is in the instructions, but I still need to support those who don't want to provide the value
       // and only use the "notes" feature.
@@ -414,12 +483,27 @@ export default defineComponent({
       });
     }
 
-    function getIngredientByRefId(refId: string) {
-      const ing = props.ingredients.find((ing) => ing.referenceId === refId) || "";
+    const ingredientLookup = computed(() => {
+      const results: { [key: string]: RecipeIngredient } = {};
+      return props.ingredients.reduce((prev, ing) => {
+        if (ing.referenceId === undefined) {
+          return prev;
+        }
+        prev[ing.referenceId] = ing;
+        return prev;
+      }, results);
+    });
+
+    function getIngredientByRefId(refId: string | undefined) {
+      if (refId === undefined) {
+        return "";
+      }
+
+      const ing = ingredientLookup.value[refId] ?? "";
       if (ing === "") {
         return "";
       }
-      return parseIngredientText(ing, props.disableAmount);
+      return parseIngredientText(ing, props.disableAmount, props.scale);
     }
 
     // ===============================================================
@@ -493,7 +577,63 @@ export default defineComponent({
 
     const drag = ref(false);
 
+    // ===============================================================
+    // Image Uploader
+    const api = useUserApi();
+    const { recipeAssetPath } = useStaticRoutes();
+
+    const imageUploadMode = ref(false);
+
+    function toggleDragMode() {
+      console.log("Toggling Drag Mode");
+      imageUploadMode.value = !imageUploadMode.value;
+    }
+
+    onMounted(() => {
+      if (props.assets === undefined) {
+        context.emit("update:assets", []);
+      }
+    });
+
+    async function handleImageDrop(index: number, e: DragEvent) {
+      if (!e.dataTransfer) {
+        return;
+      }
+
+      // Check if the file is an image
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.type.startsWith("image/")) {
+        return;
+      }
+
+      const { data } = await api.recipes.createAsset(props.recipeSlug, {
+        name: file.name,
+        icon: "mdi-file-image",
+        file,
+        extension: file.name.split(".").pop() || "",
+      });
+
+      if (!data) {
+        return; // TODO: Handle error
+      }
+
+      context.emit("update:assets", [...props.assets, data]);
+      const assetUrl = BASE_URL + recipeAssetPath(props.recipeId, data.fileName as string);
+      const text = `<img src="${assetUrl}" height="100%" width="100%"/>`;
+      props.value[index].text += text;
+    }
+
+    function toggleCookMode() {
+      context.emit("cookModeToggle");
+    }
+
     return {
+      // Image Uploader
+      toggleDragMode,
+      handleImageDrop,
+      imageUploadMode,
+
+      // Rest
       drag,
       togglePreviewState,
       toggleCollapseSection,
@@ -514,6 +654,8 @@ export default defineComponent({
       updateIndex,
       autoSetReferences,
       parseIngredientText,
+      toggleCookMode,
+      showCookMode,
     };
   },
 });
@@ -552,5 +694,22 @@ export default defineComponent({
 }
 .list-group-item i {
   cursor: pointer;
+}
+
+.blur {
+  filter: blur(2px);
+}
+
+.upload-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 </style>

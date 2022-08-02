@@ -10,13 +10,17 @@
           <v-list-item-icon class="ma-auto">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
-                <v-icon v-bind="attrs" v-on="on" v-text="getIconDefinition(item.icon).icon"></v-icon>
+                <v-icon v-bind="attrs" v-on="on">
+                  {{ getIconDefinition(item.icon).icon }}
+                </v-icon>
               </template>
               <span>{{ getIconDefinition(item.icon).title }}</span>
             </v-tooltip>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title class="pl-2" v-text="item.name"></v-list-item-title>
+            <v-list-item-title class="pl-2">
+              {{ item.name }}
+            </v-list-item-title>
           </v-list-item-content>
           <v-list-item-action>
             <v-btn v-if="!edit" color="primary" icon :href="assetURL(item.fileName)" target="_blank" top>
@@ -35,21 +39,21 @@
     <div class="d-flex ml-auto mt-2">
       <v-spacer></v-spacer>
       <BaseDialog
-        v-model="newAssetDialog"
-        :title="$t('asset.new-asset')"
-        :icon="getIconDefinition(newAsset.icon).icon"
+        v-model="state.newAssetDialog"
+        :title="$tc('asset.new-asset')"
+        :icon="getIconDefinition(state.newAsset.icon).icon"
         @submit="addAsset"
       >
         <template #activator>
-          <BaseButton v-if="edit" small create @click="newAssetDialog = true" />
+          <BaseButton v-if="edit" small create @click="state.newAssetDialog = true" />
         </template>
         <v-card-text class="pt-4">
-          <v-text-field v-model="newAsset.name" dense :label="$t('general.name')"></v-text-field>
+          <v-text-field v-model="state.newAsset.name" dense :label="$t('general.name')"></v-text-field>
           <div class="d-flex justify-space-between">
             <v-select
-              v-model="newAsset.icon"
+              v-model="state.newAsset.icon"
               dense
-              :prepend-icon="getIconDefinition(newAsset.icon).icon"
+              :prepend-icon="getIconDefinition(state.newAsset.icon).icon"
               :items="iconOptions"
               item-text="title"
               item-value="name"
@@ -66,7 +70,7 @@
             </v-select>
             <AppButtonUpload :post="false" file-name="file" :text-btn="false" @uploaded="setFileObject" />
           </div>
-          {{ fileObject.name }}
+          {{ state.fileObject.name }}
         </v-card-text>
       </BaseDialog>
     </div>
@@ -74,9 +78,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, useContext } from "@nuxtjs/composition-api";
+import { defineComponent, reactive, useContext } from "@nuxtjs/composition-api";
 import { useStaticRoutes, useUserApi } from "~/composables/api";
 import { alert } from "~/composables/use-toast";
+import { RecipeAsset } from "~/types/api-types/recipe";
 
 const BASE_URL = window.location.origin;
 
@@ -91,7 +96,7 @@ export default defineComponent({
       required: true,
     },
     value: {
-      type: Array,
+      type: Array as () => RecipeAsset[],
       required: true,
     },
     edit: {
@@ -181,7 +186,7 @@ export default defineComponent({
     }
 
     return {
-      ...toRefs(state),
+      state,
       addAsset,
       assetURL,
       assetEmbed,

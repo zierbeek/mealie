@@ -5,12 +5,6 @@
 [![MIT License][license-shield]][license-url]
 [![Docker Pulls][docker-pull]][docker-pull]
 [![CodeFactor](https://www.codefactor.io/repository/github/hay-kot/mealie/badge)](https://www.codefactor.io/repository/github/hay-kot/mealie)
-[![Docker Build Production](https://github.com/hay-kot/mealie/actions/workflows/dockerbuild.release.yml/badge.svg)](https://github.com/hay-kot/mealie/actions/workflows/dockerbuild.release.yml)
-[![Project Tests Production](https://github.com/hay-kot/mealie/actions/workflows/test-all.yml/badge.svg)](https://github.com/hay-kot/mealie/actions/workflows/test-all.yml)
-[![Docker Build Dev](https://github.com/hay-kot/mealie/actions/workflows/dockerbuild.dev.yml/badge.svg?branch=dev)](https://github.com/hay-kot/mealie/actions/workflows/dockerbuild.dev.yml)
-[![Project Tests Dev](https://github.com/hay-kot/mealie/actions/workflows/test-all.yml/badge.svg?branch=dev)](https://github.com/hay-kot/mealie/actions/workflows/test-all.yml)
-
-
 
 <!-- PROJECT LOGO -->
 <br />
@@ -26,19 +20,13 @@
   <p align="center">
     A Place for All Your Recipes
     <br />
-    <a href="https://hay-kot.github.io/mealie/"><strong>Explore the docs »</strong></a>
+    <a href="https://nightly.mealie.io"><strong>Explore the docs »</strong></a>
   <a href="https://github.com/hay-kot/mealie">
   </a>
     <br />
-    <a href="https://mealie-demo.hay-kot.dev/">View Demo</a>
+    <a href="https://demo.mealie.io/">View Demo</a>
     ·
     <a href="https://github.com/hay-kot/mealie/issues">Report Bug</a>
-    ·
-    <a href="https://hay-kot.github.io/mealie/api/redoc/">API</a>
-    ·
-    <a href="https://github.com/hay-kot/mealie/issues">
-    Request Feature
-    </a>
     ·
     <a href="https://hub.docker.com/r/hkotel/mealie"> Docker Hub
     </a>
@@ -54,7 +42,7 @@
 Mealie is a self hosted recipe manager and meal planner with a RestAPI backend and a reactive frontend application built in Vue for a pleasant user experience for the whole family. Easily add recipes into your database by providing the url and Mealie will automatically import the relevant data or add a family recipe with the UI editor. Mealie also provides an API for interactions from 3rd party applications.
 
 - [Remember to join the Discord](https://discord.gg/QuStdQGSGK)!
-- [Documentation](https://docs.mealie.io)
+- [Documentation](https://nightly.mealie.io)
 
 
 <!-- CONTRIBUTING -->
@@ -63,7 +51,7 @@ Mealie is a self hosted recipe manager and meal planner with a RestAPI backend a
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**. If you're going to be working on the code-base you'll want to use the nightly documentation to ensure you get the latest information.
 
 - See the [Contributors Guide](https://nightly.mealie.io/contributors/developers-guide/code-contributions/) for help getting started.
-- We use VSCode Dev Contains to make it easy for contributors to get started!
+- We use [VSCode Dev Containers](https://code.visualstudio.com/docs/remote/containers) to make it easy for contributors to get started!
 
 If you are not a coder, you can still contribute financially. financial contributions help me prioritize working on this project over others and helps me know that there is a real demand for project development.
 
@@ -99,7 +87,7 @@ Thanks to Linode for providing Hosting for the Demo, Beta, and Documentation sit
 [issues-shield]: https://img.shields.io/github/issues/hay-kot/mealie.svg?style=flat-square
 [issues-url]: https://github.com/hay-kot/mealie/issues
 [license-shield]: https://img.shields.io/github/license/hay-kot/mealie.svg?style=flat-square
-[license-url]: https://github.com/hay-kot/mealie/blob/master/LICENSE.txt
+[license-url]: https://github.com/hay-kot/mealie/blob/mealie-next/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/hay-kot
 [product-screenshot]: docs/docs/assets/img/home_screenshot.png

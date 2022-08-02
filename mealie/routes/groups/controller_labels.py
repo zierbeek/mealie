@@ -6,6 +6,7 @@ from pydantic import UUID4
 from mealie.routes._base.base_controllers import BaseUserController
 from mealie.routes._base.controller import controller
 from mealie.routes._base.mixins import HttpRepo
+from mealie.routes._base.routers import MealieCrudRoute
 from mealie.schema.labels import (
     MultiPurposeLabelCreate,
     MultiPurposeLabelOut,
@@ -13,10 +14,11 @@ from mealie.schema.labels import (
     MultiPurposeLabelSummary,
     MultiPurposeLabelUpdate,
 )
+from mealie.schema.labels.multi_purpose_label import MultiPurposeLabelPagination
 from mealie.schema.mapper import cast
-from mealie.schema.query import GetAll
+from mealie.schema.response.pagination import PaginationQuery
 
-router = APIRouter(prefix="/groups/labels", tags=["Group: Multi Purpose Labels"])
+router = APIRouter(prefix="/groups/labels", tags=["Group: Multi Purpose Labels"], route_class=MealieCrudRoute)
 
 
 @controller(router)
@@ -35,9 +37,15 @@ class MultiPurposeLabelsController(BaseUserController):
     def mixins(self) -> HttpRepo:
         return HttpRepo(self.repo, self.deps.logger, self.registered_exceptions, "An unexpected error occurred.")
 
-    @router.get("", response_model=list[MultiPurposeLabelSummary])
-    def get_all(self, q: GetAll = Depends(GetAll)):
-        return self.repo.get_all(start=q.start, limit=q.limit, override_schema=MultiPurposeLabelSummary)
+    @router.get("", response_model=MultiPurposeLabelPagination)
+    def get_all(self, q: PaginationQuery = Depends(PaginationQuery)):
+        response = self.repo.page_all(
+            pagination=q,
+            override=MultiPurposeLabelSummary,
+        )
+
+        response.set_pagination_guides(router.url_path_for("get_all"), q.dict())
+        return response
 
     @router.post("", response_model=MultiPurposeLabelOut)
     def create_one(self, data: MultiPurposeLabelCreate):

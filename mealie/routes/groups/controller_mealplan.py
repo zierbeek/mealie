@@ -1,7 +1,8 @@
-from datetime import date, timedelta
+from datetime import date
 from functools import cached_property
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from mealie.core.exceptions import mealie_registered_exceptions
 from mealie.repos.repository_meals import RepositoryMeals
@@ -9,9 +10,10 @@ from mealie.routes._base import BaseUserController, controller
 from mealie.routes._base.mixins import HttpRepo
 from mealie.schema import mapper
 from mealie.schema.meal_plan import CreatePlanEntry, ReadPlanEntry, SavePlanEntry, UpdatePlanEntry
-from mealie.schema.meal_plan.new_meal import CreatRandomEntry
+from mealie.schema.meal_plan.new_meal import CreateRandomEntry, PlanEntryPagination
 from mealie.schema.meal_plan.plan_rules import PlanRulesDay
 from mealie.schema.recipe.recipe import Recipe
+from mealie.schema.response.pagination import PaginationQuery
 from mealie.schema.response.responses import ErrorResponse
 
 router = APIRouter(prefix="/groups/mealplans", tags=["Groups: Mealplans"])
@@ -42,7 +44,7 @@ class GroupMealplanController(BaseUserController):
         return self.repo.get_today(group_id=self.group_id)
 
     @router.post("/random", response_model=ReadPlanEntry)
-    def create_random_meal(self, data: CreatRandomEntry):
+    def create_random_meal(self, data: CreateRandomEntry):
         """
         create_random_meal is a route that provides the randomized funcitonality for mealplaners.
         It operates by following the rules setout in the Groups mealplan settings. If not settings
@@ -85,11 +87,31 @@ class GroupMealplanController(BaseUserController):
         except IndexError:
             raise HTTPException(status_code=404, detail=ErrorResponse.respond(message="No recipes match your rules"))
 
-    @router.get("", response_model=list[ReadPlanEntry])
-    def get_all(self, start: date = None, limit: date = None):
-        start = start or date.today() - timedelta(days=999)
-        limit = limit or date.today() + timedelta(days=999)
-        return self.repo.get_slice(start, limit, group_id=self.group.id)
+    @router.get("", response_model=PlanEntryPagination)
+    def get_all(
+        self,
+        q: PaginationQuery = Depends(PaginationQuery),
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ):
+        # merge start and end dates into pagination query only if either is provided
+        if start_date or end_date:
+            if not start_date:
+                date_filter = f"date <= {end_date}"
+
+            elif not end_date:
+                date_filter = f"date >= {start_date}"
+
+            else:
+                date_filter = f"date >= {start_date} AND date <= {end_date}"
+
+            if q.query_filter:
+                q.query_filter = f"({q.query_filter}) AND ({date_filter})"
+
+            else:
+                q.query_filter = date_filter
+
+        return self.repo.page_all(pagination=q)
 
     @router.post("", response_model=ReadPlanEntry, status_code=201)
     def create_one(self, data: CreatePlanEntry):

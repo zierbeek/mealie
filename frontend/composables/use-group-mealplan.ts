@@ -2,9 +2,7 @@ import { useAsync, ref, Ref, watch } from "@nuxtjs/composition-api";
 import { format } from "date-fns";
 import { useAsyncKey } from "./use-utils";
 import { useUserApi } from "~/composables/api";
-import { CreateMealPlan, UpdateMealPlan } from "~/api/class-interfaces/group-mealplan";
-
-export type MealType = "breakfast" | "lunch" | "dinner" | "side";
+import { CreatePlanEntry, PlanEntryType, UpdatePlanEntry } from "~/types/api-types/meal-plan";
 
 export const planTypeOptions = [
   { text: "Breakfast", value: "breakfast" },
@@ -28,13 +26,17 @@ export const useMealplans = function (range: Ref<DateRange>) {
       loading.value = true;
       const units = useAsync(async () => {
         const query = {
-          start: format(range.value.start, "yyyy-MM-dd"),
-          limit: format(range.value.end, "yyyy-MM-dd"),
+          start_date: format(range.value.start, "yyyy-MM-dd"),
+          end_date: format(range.value.end, "yyyy-MM-dd"),
         };
         // @ts-ignore TODO Modify typing to allow for string start+limit for mealplans
-        const { data } = await api.mealplans.getAll(query.start, query.limit);
+        const { data } = await api.mealplans.getAll(1, -1, { start_date: query.start_date, end_date: query.end_date });
 
-        return data;
+        if (data) {
+          return data.items;
+        } else {
+          return null;
+        }
       }, useAsyncKey());
 
       loading.value = false;
@@ -43,19 +45,19 @@ export const useMealplans = function (range: Ref<DateRange>) {
     async refreshAll(this: void) {
       loading.value = true;
       const query = {
-        start: format(range.value.start, "yyyy-MM-dd"),
-        limit: format(range.value.end, "yyyy-MM-dd"),
+        start_date: format(range.value.start, "yyyy-MM-dd"),
+        end_date: format(range.value.end, "yyyy-MM-dd"),
       };
       // @ts-ignore TODO Modify typing to allow for string start+limit for mealplans
-      const { data } = await api.mealplans.getAll(query.start, query.limit);
+      const { data } = await api.mealplans.getAll(1, -1, { start_date: query.start_date, end_date: query.end_date });
 
-      if (data) {
-        mealplans.value = data;
+      if (data && data.items) {
+        mealplans.value = data.items;
       }
 
       loading.value = false;
     },
-    async createOne(payload: CreateMealPlan) {
+    async createOne(payload: CreatePlanEntry) {
       loading.value = true;
 
       const { data } = await api.mealplans.createOne(payload);
@@ -65,13 +67,12 @@ export const useMealplans = function (range: Ref<DateRange>) {
 
       loading.value = false;
     },
-    async updateOne(updateData: UpdateMealPlan) {
+    async updateOne(updateData: UpdatePlanEntry) {
       if (!updateData.id) {
         return;
       }
 
       loading.value = true;
-      // @ts-ignore TODO Modify mealpan types to be from auto-generated files
       const { data } = await api.mealplans.updateOne(updateData.id, updateData);
       if (data) {
         this.refreshAll();
@@ -87,8 +88,8 @@ export const useMealplans = function (range: Ref<DateRange>) {
       }
     },
 
-    async setType(payload: UpdateMealPlan, typ: MealType) {
-      payload.entryType = typ;
+    async setType(payload: UpdatePlanEntry, type: PlanEntryType) {
+      payload.entryType = type;
       await this.updateOne(payload);
     },
   };

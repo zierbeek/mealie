@@ -2,15 +2,15 @@
 
 **For Environmental Variable Configuration See:**
 
-- [Frontend Configuration](/mealie/documentation/getting-started/installation/frontend-config/)
-- [Backend Configuration](/mealie/documentation/getting-started/installation/backend-config/)
+- [Frontend Configuration](./frontend-config.md)
+- [Backend Configuration](./backend-config.md)
 
 ```yaml
 ---
 version: "3.7"
 services:
   mealie-frontend:
-    image: hkotel/mealie:frontend-nightly
+    image: hkotel/mealie:frontend-v1.0.0beta-4
     container_name: mealie-frontend
     depends_on:
       - mealie-api
@@ -23,7 +23,7 @@ services:
     volumes:
       - mealie-data:/app/data/ # (3)
   mealie-api:
-    image: hkotel/mealie:api-nightly
+    image: hkotel/mealie:api-v1.0.0beta-4
     container_name: mealie-api
     depends_on:
       - postgres

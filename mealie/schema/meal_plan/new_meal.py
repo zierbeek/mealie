@@ -7,6 +7,7 @@ from pydantic import validator
 
 from mealie.schema._mealie import MealieModel
 from mealie.schema.recipe.recipe import RecipeSummary
+from mealie.schema.response.pagination import PaginationBase
 
 
 class PlanEntryType(str, Enum):
@@ -16,7 +17,7 @@ class PlanEntryType(str, Enum):
     side = "side"
 
 
-class CreatRandomEntry(MealieModel):
+class CreateRandomEntry(MealieModel):
     date: date
     entry_type: PlanEntryType = PlanEntryType.dinner
 
@@ -54,3 +55,7 @@ class ReadPlanEntry(UpdatePlanEntry):
 
     class Config:
         orm_mode = True
+
+
+class PlanEntryPagination(PaginationBase):
+    items: list[ReadPlanEntry]

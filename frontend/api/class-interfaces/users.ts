@@ -1,29 +1,15 @@
 import { BaseCRUDAPI } from "../_base";
-import { UserIn, UserOut } from "~/types/api-types/user";
-
-// Interfaces
-
-interface ChangePassword {
-  currentPassword: string;
-  newPassword: string;
-}
-
-interface CreateAPIToken {
-  name: string;
-}
-
-interface ResponseToken {
-  token: string;
-}
-
-interface PasswordResetPayload {
-  token: string;
-  email: string;
-  password: string;
-  passwordConfirm: string;
-}
-
-// Code
+import {
+  ChangePassword,
+  DeleteTokenResponse,
+  LongLiveTokenIn,
+  LongLiveTokenOut,
+  ResetPassword,
+  UserBase,
+  UserFavorites,
+  UserIn,
+  UserOut,
+} from "~/types/api-types/user";
 
 const prefix = "/api";
 
@@ -43,7 +29,7 @@ const routes = {
   usersApiTokensTokenId: (token_id: string | number) => `${prefix}/users/api-tokens/${token_id}`,
 };
 
-export class UserApi extends BaseCRUDAPI<UserOut, UserIn> {
+export class UserApi extends BaseCRUDAPI<UserIn, UserOut, UserBase> {
   baseRoute: string = routes.users;
   itemRoute = (itemid: string) => routes.usersId(itemid);
 
@@ -56,19 +42,19 @@ export class UserApi extends BaseCRUDAPI<UserOut, UserIn> {
   }
 
   async getFavorites(id: string) {
-    await this.requests.get(routes.usersIdFavorites(id));
+    return await this.requests.get<UserFavorites>(routes.usersIdFavorites(id));
   }
 
   async changePassword(id: string, changePassword: ChangePassword) {
     return await this.requests.put(routes.usersIdPassword(id), changePassword);
   }
 
-  async createAPIToken(tokenName: CreateAPIToken) {
-    return await this.requests.post<ResponseToken>(routes.usersApiTokens, tokenName);
+  async createAPIToken(tokenName: LongLiveTokenIn) {
+    return await this.requests.post<LongLiveTokenOut>(routes.usersApiTokens, tokenName);
   }
 
-  async deleteAPIToken(tokenId: string | number) {
-    return await this.requests.delete(routes.usersApiTokensTokenId(tokenId));
+  async deleteAPIToken(tokenId: number) {
+    return await this.requests.delete<DeleteTokenResponse>(routes.usersApiTokensTokenId(tokenId));
   }
 
   userProfileImage(id: string) {
@@ -76,7 +62,7 @@ export class UserApi extends BaseCRUDAPI<UserOut, UserIn> {
     return `/api/users/${id}/image`;
   }
 
-  async resetPassword(payload: PasswordResetPayload) {
+  async resetPassword(payload: ResetPassword) {
     return await this.requests.post(routes.passwordReset, payload);
   }
 }

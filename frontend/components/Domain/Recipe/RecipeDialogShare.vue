@@ -57,9 +57,8 @@
 
 <script lang="ts">
 import { defineComponent, computed, toRefs, reactive, useContext } from "@nuxtjs/composition-api";
-import { whenever } from "@vueuse/shared";
-import { useClipboard, useShare } from "@vueuse/core";
-import { RecipeShareToken } from "~/api/class-interfaces/recipes/recipe-share";
+import { useClipboard, useShare, whenever } from "@vueuse/core";
+import { RecipeShareToken } from "~/types/api-types/recipe";
 import { useUserApi } from "~/composables/api";
 import { alert } from "~/composables/use-toast";
 
@@ -118,7 +117,7 @@ export default defineComponent({
 
       const { data } = await userApi.recipes.share.createOne({
         recipeId: props.recipeId,
-        expiresAt: expirationDate,
+        expiresAt: expirationDate.toISOString(),
       });
 
       if (data) {
@@ -132,10 +131,10 @@ export default defineComponent({
     }
 
     async function refreshTokens() {
-      const { data } = await userApi.recipes.share.getAll(0, 999, { recipe_id: props.recipeId });
+      const { data } = await userApi.recipes.share.getAll(1, -1, { recipe_id: props.recipeId });
 
       if (data) {
-        state.tokens = data;
+        state.tokens = data.items ?? [];
       }
     }
 

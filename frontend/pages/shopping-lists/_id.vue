@@ -187,17 +187,17 @@
 <script lang="ts">
 import draggable from "vuedraggable";
 
-import { defineComponent, useAsync, useRoute, computed, ref } from "@nuxtjs/composition-api";
+import { defineComponent, useAsync, useRoute, computed, ref, watch } from "@nuxtjs/composition-api";
 import { useToggle } from "@vueuse/core";
 import { useCopyList } from "~/composables/use-copy";
 import { useUserApi } from "~/composables/api";
 import { useAsyncKey } from "~/composables/use-utils";
 import ShoppingListItem from "~/components/Domain/ShoppingList/ShoppingListItem.vue";
-import { MultiPurposeLabelOut } from "~/types/api-types/labels";
 import { ShoppingListItemCreate, ShoppingListItemOut } from "~/types/api-types/group";
 import RecipeList from "~/components/Domain/Recipe/RecipeList.vue";
 import ShoppingListItemEditor from "~/components/Domain/ShoppingList/ShoppingListItemEditor.vue";
 import { getDisplayText } from "~/composables/use-display-text";
+import { useFoodStore, useLabelStore, useUnitStore } from "~/composables/store";
 
 type CopyTypes = "plain" | "markdown";
 
@@ -336,17 +336,9 @@ export default defineComponent({
     // Labels, Units, Foods
     // TODO: Extract to Composable
 
-    const allLabels = ref([] as MultiPurposeLabelOut[]);
-
-    const allUnits = useAsync(async () => {
-      const { data } = await userApi.units.getAll();
-      return data ?? [];
-    }, useAsyncKey());
-
-    const allFoods = useAsync(async () => {
-      const { data } = await userApi.foods.getAll();
-      return data ?? [];
-    }, useAsyncKey());
+    const { labels: allLabels } = useLabelStore();
+    const { units: allUnits } = useUnitStore();
+    const { foods: allFoods } = useFoodStore();
 
     function sortByLabels() {
       byLabel.value = !byLabel.value;
@@ -367,11 +359,13 @@ export default defineComponent({
       return labels;
     });
 
-    const itemsByLabel = computed(() => {
-      const items: { [prop: string]: ShoppingListItemCreate[] } = {};
+    const itemsByLabel = ref<{ [key: string]: ShoppingListItemOut[] }>({});
+
+    function updateItemsByLabel() {
+      const items: { [prop: string]: ShoppingListItemOut[] } = {};
 
       const noLabel = {
-        "No Label": [] as ShoppingListItemCreate[],
+        "No Label": [] as ShoppingListItemOut[],
       };
 
       shoppingList.value?.listItems?.forEach((item) => {
@@ -394,12 +388,19 @@ export default defineComponent({
         items["No Label"] = noLabel["No Label"];
       }
 
-      return items;
+      itemsByLabel.value = items;
+    }
+
+    watch(shoppingList, () => {
+      updateItemsByLabel();
     });
 
     async function refreshLabels() {
       const { data } = await userApi.multiPurposeLabels.getAll();
-      allLabels.value = data ?? [];
+
+      if (data) {
+        allLabels.value = data.items ?? [];
+      }
     }
 
     refreshLabels();

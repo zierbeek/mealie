@@ -26,15 +26,6 @@ export interface TagBase {
   id: string;
   slug: string;
 }
-export interface BulkActionError {
-  recipe: string;
-  error: string;
-}
-export interface BulkActionsResponse {
-  success: boolean;
-  message: string;
-  errors?: BulkActionError[];
-}
 export interface CategoryIn {
   name: string;
 }
@@ -58,6 +49,7 @@ export interface CreateIngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
 }
 export interface CreateRecipe {
   name: string;
@@ -126,6 +118,7 @@ export interface IngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
   id: string;
 }
 export interface IngredientsRequest {
@@ -335,6 +328,9 @@ export interface RecipeToolSave {
   onHand?: boolean;
   groupId: string;
 }
+export interface RecipeZipTokenResponse {
+  token: string;
+}
 export interface SaveIngredientFood {
   name: string;
   description?: string;
@@ -346,6 +342,7 @@ export interface SaveIngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
   groupId: string;
 }
 export interface ScrapeRecipe {
@@ -372,4 +369,7 @@ export interface TagSave {
 export interface UnitFoodBase {
   name: string;
   description?: string;
+}
+export interface UpdateImageResponse {
+  image: string;
 }

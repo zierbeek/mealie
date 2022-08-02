@@ -9,7 +9,7 @@
     "database-url": "Databas URL",
     "default-group": "Standardgrupp",
     "demo": "Demo",
-    "demo-status": "Demo Status",
+    "demo-status": "Status för demo",
     "development": "Utveckling",
     "docs": "Dokumentation",
     "download-log": "Ladda ner logg",
@@ -33,6 +33,7 @@
     "show-assets": "Visa tillgångar"
   },
   "category": {
+    "categories": "Kategorier",
     "category-created": "Kategori skapad",
     "category-creation-failed": "Kategori gick inte att skapa",
     "category-deleted": "Kategori raderad",
@@ -65,7 +66,7 @@
     "create": "Skapa",
     "created": "Skapad",
     "custom": "Anpassad",
-    "dashboard": "Dashboard",
+    "dashboard": "Startsida",
     "delete": "Ta bort",
     "disabled": "Inaktiverad",
     "download": "Ladda ner",
@@ -129,7 +130,11 @@
     "url": "URL",
     "view": "Visa",
     "wednesday": "Onsdag",
-    "yes": "Ja"
+    "yes": "Ja",
+    "foods": "Mat",
+    "units": "Enheter",
+    "back": "Tillbaka",
+    "next": "Nästa"
   },
   "group": {
     "are-you-sure-you-want-to-delete-the-group": "Är du säker på att du vill radera <b>{groupName}<b/>?",
@@ -149,7 +154,11 @@
     "manage-groups": "Hantera grupper",
     "user-group": "Användargrupp",
     "user-group-created": "Användargrupp skapad",
-    "user-group-creation-failed": "Gruppen gick inte att skapa"
+    "user-group-creation-failed": "Gruppen gick inte att skapa",
+    "settings": {
+      "keep-my-recipes-private": "Behåll mina recept privata",
+      "keep-my-recipes-private-description": "Sätter din grupp och alla recept till privata som förval. Du kan alltid ändra detta senare."
+    }
   },
   "meal-plan": {
     "create-a-new-meal-plan": "Skapa en ny måltidsplan",
@@ -206,7 +215,10 @@
     "upload-a-recipe": "Ladda upp ett recept",
     "upload-individual-zip-file": "Ladda upp en individuell .zip-fil som exporteras från en annan Mealie-instans.",
     "url-form-hint": "Kopiera och klistra in en länk från din favorit recept webbplats",
-    "view-scraped-data": "Visa skrotade data"
+    "view-scraped-data": "Visa skrotade data",
+    "trim-whitespace-description": "Ta bort inledande och avslutande blanksteg samt tomma rader",
+    "trim-prefix-description": "Ta bort första tecknet från varje rad",
+    "split-by-numbered-line-description": "Försök att dela ett stycke genom att matcha mönstret '1)' eller '1.'"
   },
   "page": {
     "404-page-not-found": "404 sidan hittades inte",
@@ -224,7 +236,7 @@
   "recipe": {
     "add-key": "Lägg till nyckel",
     "add-to-favorites": "Lägg till i favoriter",
-    "api-extras": "API Extras",
+    "api-extras": "API-tillägg",
     "calories": "Kalorier",
     "calories-suffix": "kalorier",
     "carbohydrate-content": "Kolhydrat",
@@ -236,8 +248,9 @@
     "description": "Beskrivning",
     "disable-amount": "Inaktivera ingredienser mängder",
     "disable-comments": "Inaktivera kommentarer",
+    "edit-scale": "Ändra skala",
     "fat-content": "Fett",
-    "fiber-content": "Fiber",
+    "fiber-content": "Fibrer",
     "grams": "gram",
     "ingredient": "Ingrediens",
     "ingredients": "Ingredienser",
@@ -278,9 +291,7 @@
     "sugar-content": "Socker",
     "title": "Titel",
     "total-time": "Total tid",
-    "unable-to-delete-recipe": "Gick inte att radera receptet"
-  },
-  "reicpe": {
+    "unable-to-delete-recipe": "Gick inte att radera receptet",
     "no-recipe": "Inget recept"
   },
   "search": {
@@ -350,7 +361,7 @@
       "error-creating-theme-see-log-file": "Fel vid skapande av tema. Se loggfil.",
       "error-deleting-theme": "Fel vid borttagning av tema",
       "error-updating-theme": "Gick inte att uppdatera tema",
-      "info": "Info",
+      "info": "Information",
       "light": "Ljust",
       "primary": "Primär",
       "secondary": "Sekundär",
@@ -386,8 +397,9 @@
     "webhooks": {
       "test-webhooks": "Testa Webhooks",
       "the-urls-listed-below-will-recieve-webhooks-containing-the-recipe-data-for-the-meal-plan-on-its-scheduled-day-currently-webhooks-will-execute-at": "Följande webbadresser kommer att mottaga webhooks med receptdata för dagens planerade måltid. För närvarande körs webhooks klockan",
-      "webhook-url": "Webhook URL",
-      "webhooks-caps": "WEBHOOKS"
+      "webhook-url": "Webhook-URL",
+      "webhooks-caps": "WEBHOOKS",
+      "webhooks": "Webhooks"
     }
   },
   "shopping-list": {
@@ -402,7 +414,9 @@
   },
   "sidebar": {
     "all-recipes": "Alla recept",
+    "backups": "Säkerhetskopior",
     "categories": "Kategorier",
+    "cookbooks": "Kokböcker",
     "dashboard": "Startsida",
     "home-page": "Startsida",
     "manage-users": "Användare",
@@ -411,7 +425,8 @@
     "search": "Sök",
     "site-settings": "Inställningar",
     "tags": "Taggar",
-    "toolbox": "Verktygslåda"
+    "toolbox": "Verktygslåda",
+    "language": "Språk"
   },
   "signup": {
     "error-signing-up": "Fel vid registreringen",
@@ -433,6 +448,9 @@
     "tags": "Taggar",
     "untagged-count": "Otaggad {count}"
   },
+  "tool": {
+    "tools": "Verktyg"
+  },
   "user": {
     "admin": "Administratör",
     "are-you-sure-you-want-to-delete-the-link": "Är du säker på att du vill ta bort länken <b> {link} <b />?",
@@ -450,40 +468,83 @@
     "error-cannot-delete-super-user": "Fel! Det går inte att ta bort superanvändare",
     "existing-password-does-not-match": "Befintligt lösenord matchar inte",
     "full-name": "Fullständigt namn",
+    "invite-only": "Endast inbjudna",
     "link-id": "Länk ID",
     "link-name": "Länk namn",
-    "login": "Login",
+    "login": "Logga in",
     "logout": "Logga ut",
     "manage-users": "Hantera användare",
     "new-password": "Nytt lösenord",
     "new-user": "Ny användare",
-    "password": "Lösenord",
     "password-has-been-reset-to-the-default-password": "Lösenordet har återställts till standardlösenordet",
     "password-must-match": "Lösenordet måste matcha",
     "password-reset-failed": "Återställningen av lösenordet misslyckades",
     "password-updated": "Lösenord uppdaterat",
+    "password": "Lösenord",
+    "password-strength": "Lösenordsstyrka {strength}",
+    "register": "Registrering",
     "reset-password": "Ändra lösenord",
     "sign-in": "Logga in",
     "total-mealplans": "Antal måltidsplaner",
     "total-users": "Antal användare",
     "upload-photo": "Ladda upp bild",
     "use-8-characters-or-more-for-your-password": "Använd 8 tecken eller mer för ditt lösenord",
-    "user": "Användare",
     "user-created": "Användare skapad",
     "user-creation-failed": "Det gick inte att skapa användare",
     "user-deleted": "Användare raderad",
-    "user-id": "Användar ID",
     "user-id-with-value": "Användar ID: {id}",
+    "user-id": "Användar ID",
     "user-password": "Användarlösenord",
     "user-successfully-logged-in": "Användaren inloggad",
     "user-update-failed": "Gick inte att uppdatera användare",
     "user-updated": "Användare uppdaterad",
+    "user": "Användare",
     "username": "Användarnamn",
-    "users": "Användare",
     "users-header": "ANVÄNDARE",
+    "users": "Användare",
     "webhook-time": "Webbhook tid",
     "webhooks-enabled": "Webhooks aktiverat",
     "you-are-not-allowed-to-create-a-user": "Du har inte behörighet att skapa en användare",
-    "you-are-not-allowed-to-delete-this-user": "Du har inte behörighet att radera denna användare"
+    "you-are-not-allowed-to-delete-this-user": "Du har inte behörighet att radera denna användare",
+    "enable-advanced-content": "Aktivera avancerade funktioner",
+    "enable-advanced-content-description": "Aktiverar avancerade funktioner som receptskalning, API-nycklar, Webhooks och datahantering. Oroa dig inte, du kan alltid ändra detta senare"
+  },
+  "language-dialog": {
+    "translated": "översatt",
+    "choose-language": "Välj språk",
+    "select-description": "Välj språk för Mealie användargränssnitt. Inställningen gäller endast för dig, inte andra användare.",
+    "how-to-contribute-description": "Är något inte översatt ännu, felöversatt eller saknas ditt språk i listan? {read-the-docs-link} om hur man bidrar!",
+    "read-the-docs": "Läs dokumentationen"
+  },
+  "data-pages": {
+    "seed-data": "Exempeldata",
+    "foods": {
+      "merge-dialog-text": "Kombinera valda livsmedel kommer att slå samman de valda livsmedlen till ett livsmedel. Ursprungslivsmedlet kommer att raderas och alla hänvisningar till detta kommer att uppdateras för att peka på det kombinerade livsmedlet.",
+      "merge-food-example": "Slå ihop {food1} till {food2}",
+      "seed-dialog-text": "Fyll databasen med livsmedel baserade på ditt språk. Detta kommer att skapa 200+ vanliga livsmedel som kan användas för att organisera din databas. Livsmedlen översätts via ett gemenskapsinsats.",
+      "seed-dialog-warning": "Du har redan några objekt i din databas. Denna åtgärd kommer inte att förena dubbletter, du kommer att behöva hantera dem manuellt."
+    },
+    "units": {
+      "seed-dialog-text": "Fyll databasen med vanliga enheter baserade på ditt språk."
+    },
+    "labels": {
+      "seed-dialog-text": "Fyll databasen med vanliga etiketter baserade på ditt språk."
+    }
+  },
+  "user-registration": {
+    "user-registration": "Användarregistrering",
+    "join-a-group": "Gå med i en grupp",
+    "create-a-new-group": "Skapa en ny grupp",
+    "provide-registration-token-description": "Ange registreringstoken som är kopplad till den grupp som du vill gå med. Du måste få detta från en befintlig gruppmedlem.",
+    "group-details": "Gruppuppgifter",
+    "group-details-description": "Innan du skapar ett konto måste du skapa en grupp. Din grupp kommer bara att innehålla dig, men du kommer att kunna bjuda in andra senare. Medlemmarna i din grupp kan dela måltidsplaner, inköpslistor, recept och mycket mer!",
+    "use-seed-data": "Använd exempeldata",
+    "use-seed-data-description": "Mealie innehåller en samling av livsmedel, enheter och etiketter som kan användas för att fylla din grupp med användbara data för att organisera dina recept.",
+    "account-details": "Kontouppgifter"
+  },
+  "validation": {
+    "group-name-is-taken": "Gruppnamnet är upptaget",
+    "username-is-taken": "Användarnamnet är upptaget",
+    "email-is-taken": "E-postadressen är upptagen"
   }
 }

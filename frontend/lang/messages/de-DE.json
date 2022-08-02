@@ -3,7 +3,7 @@
     "about": "Über",
     "about-mealie": "Über Mealie",
     "api-docs": "API Dokumentation",
-    "api-port": "API Port",
+    "api-port": "API-Port",
     "application-mode": "Anwendungsmodus",
     "database-type": "Datenbanktyp",
     "database-url": "Datenbank URL",
@@ -33,6 +33,7 @@
     "show-assets": "Anhänge anzeigen"
   },
   "category": {
+    "categories": "Kategorien",
     "category-created": "Kategorie angelegt",
     "category-creation-failed": "Anlegen der Kategorie fehlgeschlagen",
     "category-deleted": "Kategorie entfernt",
@@ -43,7 +44,7 @@
     "uncategorized-count": "{count} nicht kategorisierte"
   },
   "events": {
-    "apprise-url": "Apprise URL",
+    "apprise-url": "Apprise-URL",
     "database": "Datenbank",
     "delete-event": "Ereignis löschen",
     "new-notification-form-description": "Mealie verwendet die Apprise-Bibliothek, um Benachrichtigungen zu erzeugen. Sie bietet viele Optionen für Dienste an, die für Benachrichtigungen genutzt werden können. Werfe einen Blick in ihr Wiki für eine umfassende Anleitung zum Erstellen der URL für Ihren Dienst. Falls verfügbar, kann die Auswahl des Benachrichtigungstyps zusätzliche Funktionen enthalten.",
@@ -65,7 +66,7 @@
     "create": "Erstellen",
     "created": "Erstellt",
     "custom": "Benutzerdefiniert",
-    "dashboard": "Dashboard",
+    "dashboard": "Übersicht",
     "delete": "Löschen",
     "disabled": "Deaktiviert",
     "download": "Herunterladen",
@@ -87,7 +88,7 @@
     "image-upload-failed": "Das Bild konnte nicht hochgeladen werden",
     "import": "Importieren",
     "json": "JSON",
-    "keyword": "Keyword",
+    "keyword": "Schlüsselwort",
     "link-copied": "Link kopiert",
     "loading-recipes": "Lade Rezepte",
     "monday": "Montag",
@@ -117,7 +118,7 @@
     "success-count": "Erfolgreich: {count}",
     "sunday": "Sonntag",
     "templates": "Vorlagen:",
-    "test": "Test",
+    "test": "Testen",
     "themes": "Themen",
     "thursday": "Donnerstag",
     "token": "Token",
@@ -129,7 +130,11 @@
     "url": "URL",
     "view": "Ansicht",
     "wednesday": "Mittwoch",
-    "yes": "Ja"
+    "yes": "Ja",
+    "foods": "Speisen",
+    "units": "Einheiten",
+    "back": "Zurück",
+    "next": "Weiter"
   },
   "group": {
     "are-you-sure-you-want-to-delete-the-group": "Bist du dir sicher, dass du die Gruppe <b>{groupName}<b/> löschen möchtest?",
@@ -149,7 +154,11 @@
     "manage-groups": "Gruppen verwalten",
     "user-group": "Benutzergruppe",
     "user-group-created": "Benutzergruppe angelegt",
-    "user-group-creation-failed": "Anlegen der Benutzergruppe fehlgeschlagen"
+    "user-group-creation-failed": "Anlegen der Benutzergruppe fehlgeschlagen",
+    "settings": {
+      "keep-my-recipes-private": "Meine Rezepte privat halten",
+      "keep-my-recipes-private-description": "Setzt Ihre Gruppe und alle Rezepte standardmäßig privat. Sie können dies später jederzeit ändern."
+    }
   },
   "meal-plan": {
     "create-a-new-meal-plan": "Neuen Essensplan erstellen",
@@ -197,7 +206,7 @@
     "error-details": "Mealie kann Rezepte nur von Webseiten importieren, die Id+json oder Mikrodaten enthalten. Die meisten großen Rezeptwebseiten unterstützen diese Datenstruktur. Wenn das Rezept nicht importiert werden kann, aber JSON-Daten im Log vorhanden sind, melde es bitte mit der URL und diesen Daten auf GitHub.",
     "error-title": "Anscheinend konnten wir nichts finden",
     "from-url": "Von URL",
-    "github-issues": "GitHub Issues",
+    "github-issues": "GitHub Fehlermeldungen",
     "google-ld-json-info": "Google ld+json Info",
     "must-be-a-valid-url": "Muss eine gültige URL sein",
     "paste-in-your-recipe-data-each-line-will-be-treated-as-an-item-in-a-list": "Füge deine Rezeptdaten ein. Jede Zeile wird als Eintrag in einer Liste dargestellt",
@@ -206,7 +215,10 @@
     "upload-a-recipe": "Rezept hochladen",
     "upload-individual-zip-file": "Lade eine individuelle .zip-Datei hoch, die von einer anderen Mealie-Instanz exportiert wird.",
     "url-form-hint": "Kopiere einen Link von deiner Lieblingsrezept-Website und füge ihn ein",
-    "view-scraped-data": "Gesammelte Daten anzeigen"
+    "view-scraped-data": "Gesammelte Daten anzeigen",
+    "trim-whitespace-description": "Leerzeichen am Anfang und Ende sowie leere Zeilen entfernen",
+    "trim-prefix-description": "Erste Zeichen aus jeder Zeile entfernen",
+    "split-by-numbered-line-description": "Absätze nach dem Schema '1)' oder '1.' aufzuteilen versuchen"
   },
   "page": {
     "404-page-not-found": "404 Seite nicht gefunden",
@@ -236,6 +248,7 @@
     "description": "Beschreibung",
     "disable-amount": "Zutatenmenge deaktivieren",
     "disable-comments": "Kommentare deaktivieren",
+    "edit-scale": "Edit Scale",
     "fat-content": "Fett",
     "fiber-content": "Ballaststoffe",
     "grams": "g",
@@ -278,9 +291,7 @@
     "sugar-content": "Zucker",
     "title": "Titel",
     "total-time": "Gesamtzeit",
-    "unable-to-delete-recipe": "Rezept kann nicht gelöscht werden"
-  },
-  "reicpe": {
+    "unable-to-delete-recipe": "Rezept kann nicht gelöscht werden",
     "no-recipe": "Kein Rezept"
   },
   "search": {
@@ -386,8 +397,9 @@
     "webhooks": {
       "test-webhooks": "Teste Webhooks",
       "the-urls-listed-below-will-recieve-webhooks-containing-the-recipe-data-for-the-meal-plan-on-its-scheduled-day-currently-webhooks-will-execute-at": "Die unten stehenden URL's erhalten Webhooks welche die Rezeptdaten für den Menüplan am geplanten Tag enthalten. Derzeit werden die Webhooks ausgeführt um",
-      "webhook-url": "Webhook URL",
-      "webhooks-caps": "WEBHOOKS"
+      "webhook-url": "Webhook-URL",
+      "webhooks-caps": "WEBHOOKS",
+      "webhooks": "Webhooks"
     }
   },
   "shopping-list": {
@@ -402,7 +414,9 @@
   },
   "sidebar": {
     "all-recipes": "Alle Rezepte",
+    "backups": "Sicherungen",
     "categories": "Kategorien",
+    "cookbooks": "Kochbücher",
     "dashboard": "Übersicht",
     "home-page": "Startseite",
     "manage-users": "Benutzer",
@@ -411,7 +425,8 @@
     "search": "Suche",
     "site-settings": "Einstellungen",
     "tags": "Schlagworte",
-    "toolbox": "Werkzeuge"
+    "toolbox": "Werkzeuge",
+    "language": "Sprache"
   },
   "signup": {
     "error-signing-up": "Fehler beim Registrieren",
@@ -433,6 +448,9 @@
     "tags": "Schlagworte",
     "untagged-count": "{count} ohne Schlagworte"
   },
+  "tool": {
+    "tools": "Werkzeuge"
+  },
   "user": {
     "admin": "Admin",
     "are-you-sure-you-want-to-delete-the-link": "Bist du dir sicher, dass du den Link <b>{link}<b/> löschen möchtest?",
@@ -450,6 +468,7 @@
     "error-cannot-delete-super-user": "Fehler! Super Benutzer kann nicht gelöscht werden",
     "existing-password-does-not-match": "Bestehendes Passwort stimmt nicht überein",
     "full-name": "Vollständiger Name",
+    "invite-only": "Nur auf Einladung",
     "link-id": "Linkkennung",
     "link-name": "Linkname",
     "login": "Anmeldung",
@@ -457,33 +476,75 @@
     "manage-users": "Benutzer verwalten",
     "new-password": "Neues Passwort",
     "new-user": "Neuer Benutzer",
-    "password": "Passwort",
     "password-has-been-reset-to-the-default-password": "Passwort wurde auf das Standardpasswort zurückgesetzt",
     "password-must-match": "Passwörter müssen übereinstimmen",
     "password-reset-failed": "Zurücksetzen des Passworts fehlgeschlagen",
     "password-updated": "Passwort aktualisiert",
+    "password": "Passwort",
+    "password-strength": "Das Passwort ist {strength}",
+    "register": "Registrieren",
     "reset-password": "Passwort zurücksetzen",
     "sign-in": "Einloggen",
     "total-mealplans": "Alle Essenspläne",
     "total-users": "Alle Benutzer",
     "upload-photo": "Foto hochladen",
     "use-8-characters-or-more-for-your-password": "Benutze 8 oder mehr Zeichen für das Passwort",
-    "user": "Benutzer",
     "user-created": "Benutzer angelegt",
     "user-creation-failed": "Anlegen des Benutzers fehlgeschlagen",
     "user-deleted": "Benutzer entfernt",
-    "user-id": "Benutzerkennung",
     "user-id-with-value": "Benutzerkennung: {id}",
+    "user-id": "Benutzerkennung",
     "user-password": "Benutzerpasswort",
     "user-successfully-logged-in": "Benutzer erfolgreich angemeldet",
     "user-update-failed": "Aktualisieren des Benutzers fehlgeschlagen",
     "user-updated": "Benutzer aktualisiert",
+    "user": "Benutzer",
     "username": "Benutzername",
-    "users": "Benutzer",
     "users-header": "BENUTZER",
+    "users": "Benutzer",
     "webhook-time": "Webhook Zeit",
     "webhooks-enabled": "Webhooks aktiviert",
     "you-are-not-allowed-to-create-a-user": "Sie sind nicht berechtigt, einen Benutzer anzulegen",
-    "you-are-not-allowed-to-delete-this-user": "Sie sind nicht berechtigt, diesen Benutzer zu entfernen"
+    "you-are-not-allowed-to-delete-this-user": "Sie sind nicht berechtigt, diesen Benutzer zu entfernen",
+    "enable-advanced-content": "Erweiterten Inhalt aktivieren",
+    "enable-advanced-content-description": "Aktiviert zusätzliche Funktionen wie Rezept-Skalierung, API-Schlüssel, Webhooks und Datenverwaltung. Keine Sorge, das kann später noch geändert werden."
+  },
+  "language-dialog": {
+    "translated": "übersetzt",
+    "choose-language": "Sprache wählen",
+    "select-description": "Wählen Sie die Sprache für die Mealie-Benutzeroberfläche. Die Einstellung gilt nur für Sie, nicht für andere Benutzer.",
+    "how-to-contribute-description": "Ist etwas noch nicht übersetzt, falsch oder deine Sprache fehlt in der Liste? {read-the-docs-link} wie man beiträgt!",
+    "read-the-docs": "Dokumentation lesen"
+  },
+  "data-pages": {
+    "seed-data": "Musterdaten",
+    "foods": {
+      "merge-dialog-text": "Zusammenführen der ausgewählten Lebensmittel führt diese zusammen in ein einzelnes Lebensmittel. Die Ausgangslebensmittel werden gelöscht und alle Verweise werden auf das zusammengeführte Lebensmittel angepasst.",
+      "merge-food-example": "{food1} wird zu {food2} zusammengeführt",
+      "seed-dialog-text": "Füllt die Datenbank mit Lebensmitteln basierend auf Ihrer Landessprache. Dadurch werden mehr als 200 gängige Lebensmittel eingetragen, die verwendet werden können, um die Datenbank zu organisieren. Die Speisen werden über einen Gemeinschaftsanstrengung übersetzt.",
+      "seed-dialog-warning": "Sie haben bereits einige Elemente in Ihrer Datenbank. Diese Aktion wird Duplikate nicht ausgleichen, Sie müssen sie manuell verwalten."
+    },
+    "units": {
+      "seed-dialog-text": "Füllt die Datenbank mit gängigen Maßeinheiten basierend auf Ihrer Sprache."
+    },
+    "labels": {
+      "seed-dialog-text": "Füllt die Datenbank mit gängigen Etiketten basierend auf Ihrer Sprache."
+    }
+  },
+  "user-registration": {
+    "user-registration": "Benutzerregistrierung",
+    "join-a-group": "Gruppe beitreten",
+    "create-a-new-group": "Neue Gruppe erstellen",
+    "provide-registration-token-description": "Bitte gib den Registrierungstoken für die Gruppe ein, der du beitreten möchtest. Du kannst ihn von einem bestehenden Gruppenmitglied erhalten.",
+    "group-details": "Gruppendetails",
+    "group-details-description": "Bevor Sie ein Konto erstellen, müssen Sie eine Gruppe erstellen. Ihre Gruppe wird nur Sie enthalten, aber Sie können andere später einladen. Mitglieder in Ihrer Gruppe können Essenspläne, Einkaufslisten, Rezepte und vieles mehr teilen!",
+    "use-seed-data": "Musterdaten",
+    "use-seed-data-description": "Mealie enthält eine Sammlung von Lebensmitteln, Maßeinheiten und Etiketten, die verwendet werden können, um deine Gruppe mit hilfreichen Daten für die Organisation deiner Rezepte zu füllen.",
+    "account-details": "Kontoinformationen"
+  },
+  "validation": {
+    "group-name-is-taken": "Gruppenname ist schon vergeben",
+    "username-is-taken": "Benutzername ist schon vergeben",
+    "email-is-taken": "E-Mail-Adresse ist schon vergeben"
   }
 }

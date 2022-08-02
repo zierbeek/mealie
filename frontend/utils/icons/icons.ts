@@ -45,6 +45,14 @@ import {
   mdiCodeJson,
   mdiCog,
   mdiSort,
+  mdiSortAscending,
+  mdiSortDescending,
+  mdiSortAlphabeticalAscending,
+  mdiSortAlphabeticalDescending,
+  mdiSortCalendarAscending,
+  mdiSortCalendarDescending,
+  mdiSortClockAscending,
+  mdiSortClockDescending,
   mdiOrderAlphabeticalAscending,
   mdiStar,
   mdiNewBox,
@@ -109,6 +117,7 @@ import {
   mdiChartLine,
   mdiHelpCircleOutline,
   mdiDocker,
+  mdiUndo,
 } from "@mdi/js";
 
 export const icons = {
@@ -193,6 +202,14 @@ export const icons = {
   shareVariant: mdiShareVariant,
   shuffleVariant: mdiShuffleVariant,
   sort: mdiSort,
+  sortAscending: mdiSortAscending,
+  sortDescending: mdiSortDescending,
+  sortAlphabeticalAscending: mdiSortAlphabeticalAscending,
+  sortAlphabeticalDescending: mdiSortAlphabeticalDescending,
+  sortCalendarAscending: mdiSortCalendarAscending,
+  sortCalendarDescending: mdiSortCalendarDescending,
+  sortClockAscending: mdiSortClockAscending,
+  sortClockDescending: mdiSortClockDescending,
   star: mdiStar,
   testTube: mdiTestTube,
   tools: mdiTools,
@@ -206,6 +223,7 @@ export const icons = {
   webhook: mdiWebhook,
   windowClose: mdiWindowClose,
   zip: mdiFolderZipOutline,
+  undo: mdiUndo,
 
   // Crud
   backArrow: mdiArrowLeftBoldOutline,

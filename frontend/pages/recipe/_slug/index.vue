@@ -17,7 +17,7 @@
               <RecipeRating :key="recipe.slug" :value="recipe.rating" :name="recipe.name" :slug="recipe.slug" />
             </v-card-title>
             <v-divider class="my-2"></v-divider>
-            <VueMarkdown :source="recipe.description"> </VueMarkdown>
+            <SafeMarkdown :source="recipe.description" />
             <v-divider></v-divider>
             <div class="d-flex justify-center mt-5">
               <RecipeTimeCard
@@ -35,7 +35,7 @@
           :max-width="enableLandscape ? null : '50%'"
           min-height="50"
           :height="hideImage ? undefined : imageHeight"
-          :src="recipeImage(recipe.id, imageKey)"
+          :src="recipeImage(recipe.id, recipe.image, imageKey)"
           class="d-print-none"
           @error="hideImage = true"
         >
@@ -53,10 +53,7 @@
         class="ml-auto mt-n8 pb-4"
         @close="closeEditor"
         @json="toggleJson"
-        @edit="
-          jsonEditor = false;
-          form = true;
-        "
+        @edit="toggleEdit"
         @save="updateRecipe(recipe.slug, recipe)"
         @delete="deleteRecipe(recipe.slug)"
         @print="printRecipe"
@@ -84,7 +81,7 @@
             <v-card-title class="px-0 py-2 ma-0 headline">
               {{ recipe.name }}
             </v-card-title>
-            <VueMarkdown :source="recipe.description"> </VueMarkdown>
+            <SafeMarkdown :source="recipe.description" />
 
             <div class="pb-2 d-flex justify-center flex-wrap">
               <RecipeTimeCard
@@ -176,40 +173,20 @@
             </div>
           </div>
           <div class="d-flex justify-space-between align-center pt-2 pb-3">
-            <v-tooltip v-if="!form" small top color="secondary darken-1">
+            <v-tooltip v-if="!form && recipe.recipeYield" small top color="secondary darken-1">
               <template #activator="{ on, attrs }">
-                <v-btn
-                  v-if="recipe.recipeYield"
-                  dense
-                  small
-                  :hover="false"
-                  type="label"
-                  :ripple="false"
-                  elevation="0"
-                  color="secondary darken-1"
-                  class="rounded-sm static"
+                <RecipeScaleEditButton
+                  v-model.number="scale"
                   v-bind="attrs"
-                  @click="scale = 1"
+                  :recipe-yield="recipe.recipeYield"
+                  :basic-yield="basicYield"
+                  :scaled-yield="scaledYield"
+                  :edit-scale="!recipe.settings.disableAmount && !form"
                   v-on="on"
-                >
-                  {{ scaledYield }}
-                </v-btn>
+                />
               </template>
-              <span> Reset Scale </span>
+              <span> {{ $t("recipe.edit-scale") }} </span>
             </v-tooltip>
-
-            <template v-if="!recipe.settings.disableAmount && !form">
-              <v-btn color="secondary darken-1" class="mx-1" small @click="scale > 1 ? scale-- : null">
-                <v-icon>
-                  {{ $globals.icons.minus }}
-                </v-icon>
-              </v-btn>
-              <v-btn color="secondary darken-1" small @click="scale++">
-                <v-icon>
-                  {{ $globals.icons.createAlt }}
-                </v-icon>
-              </v-btn>
-            </template>
             <v-spacer></v-spacer>
 
             <RecipeRating
@@ -222,7 +199,7 @@
           </div>
 
           <v-row>
-            <v-col cols="12" sm="12" md="4" lg="4">
+            <v-col v-if="!cookModeToggle || form" cols="12" sm="12" md="4" lg="4">
               <RecipeIngredients
                 v-if="!form"
                 :value="recipe.recipeIngredient"
@@ -239,7 +216,7 @@
                     hide-details
                     class="pt-0 my-auto py-auto"
                     color="secondary"
-                    @change="updateTool(recipe.tools[index])"
+                    @change="toolStore.actions.updateOne(recipe.tools[index])"
                   >
                   </v-checkbox>
                   <v-list-item-content>
@@ -256,12 +233,12 @@
                   </v-card-title>
                   <v-divider class="mx-2"></v-divider>
                   <v-card-text>
-                    <RecipeCategoryTagSelector
+                    <RecipeOrganizerSelector
                       v-if="form"
                       v-model="recipe.recipeCategory"
                       :return-object="true"
                       :show-add="true"
-                      :show-label="false"
+                      selector-type="categories"
                     />
                     <RecipeChips v-else :items="recipe.recipeCategory" />
                   </v-card-text>
@@ -274,13 +251,12 @@
                   </v-card-title>
                   <v-divider class="mx-2"></v-divider>
                   <v-card-text>
-                    <RecipeCategoryTagSelector
+                    <RecipeOrganizerSelector
                       v-if="form"
                       v-model="recipe.tags"
                       :return-object="true"
                       :show-add="true"
-                      :tag-selector="true"
-                      :show-label="false"
+                      selector-type="tags"
                     />
                     <RecipeChips v-else :items="recipe.tags" url-prefix="tags" />
                   </v-card-text>
@@ -291,7 +267,7 @@
                   <v-card-title class="py-2"> Required Tools </v-card-title>
                   <v-divider class="mx-2"></v-divider>
                   <v-card-text class="pt-0">
-                    <RecipeTools v-model="recipe.tools" :edit="form" />
+                    <RecipeOrganizerSelector v-model="recipe.tools" selector-type="tools" />
                   </v-card-text>
                 </v-card>
 
@@ -312,14 +288,24 @@
                 </client-only>
               </div>
             </v-col>
-            <v-divider v-if="$vuetify.breakpoint.mdAndUp" class="my-divider" :vertical="true"></v-divider>
+            <v-divider
+              v-if="$vuetify.breakpoint.mdAndUp && !cookModeToggle"
+              class="my-divider"
+              :vertical="true"
+            ></v-divider>
 
-            <v-col cols="12" sm="12" md="8" lg="8">
+            <v-col cols="12" sm="12" :md="8 + (cookModeToggle ? 1 : 0) * 4" :lg="8 + (cookModeToggle ? 1 : 0) * 4">
               <RecipeInstructions
                 v-model="recipe.recipeInstructions"
+                :assets.sync="recipe.assets"
                 :ingredients="recipe.recipeIngredient"
                 :disable-amount="recipe.settings.disableAmount"
                 :edit="form"
+                :recipe-id="recipe.id"
+                :recipe-slug="recipe.slug"
+                :cook-mode="cookModeToggle"
+                :scale="scale"
+                @cookModeToggle="cookModeToggle = !cookModeToggle"
               />
               <div v-if="form" class="d-flex">
                 <RecipeDialogBulkAdd class="ml-auto my-2 mr-1" @bulk-data="addStep" />
@@ -344,12 +330,12 @@
                   </v-card-title>
                   <v-divider class="mx-2"></v-divider>
                   <v-card-text>
-                    <RecipeCategoryTagSelector
+                    <RecipeOrganizerSelector
                       v-if="form"
                       v-model="recipe.recipeCategory"
                       :return-object="true"
                       :show-add="true"
-                      :show-label="false"
+                      selector-type="categories"
                     />
                     <RecipeChips v-else :items="recipe.recipeCategory" />
                   </v-card-text>
@@ -362,27 +348,27 @@
                   </v-card-title>
                   <v-divider class="mx-2"></v-divider>
                   <v-card-text>
-                    <RecipeCategoryTagSelector
+                    <RecipeOrganizerSelector
                       v-if="form"
                       v-model="recipe.tags"
                       :return-object="true"
                       :show-add="true"
-                      :tag-selector="true"
-                      :show-label="false"
+                      selector-type="tags"
                     />
+
                     <RecipeChips v-else :items="recipe.tags" url-prefix="tags" />
                   </v-card-text>
                 </v-card>
 
                 <RecipeNutrition
-                  v-if="recipe.settings.showNutrition"
+                  v-if="recipe.settings.showNutrition && !cookModeToggle"
                   v-model="recipe.nutrition"
                   class="mt-10"
                   :edit="form"
                 />
                 <client-only>
                   <RecipeAssets
-                    v-if="recipe.settings.showAssets"
+                    v-if="recipe.settings.showAssets && !cookModeToggle"
                     v-model="recipe.assets"
                     :edit="form"
                     :slug="recipe.slug"
@@ -391,7 +377,7 @@
                 </client-only>
               </div>
 
-              <RecipeNotes v-model="recipe.notes" :edit="form" />
+              <RecipeNotes v-if="!cookModeToggle" v-model="recipe.notes" :edit="form" />
             </v-col>
           </v-row>
 
@@ -403,7 +389,7 @@
               :label="$t('recipe.original-url')"
             ></v-text-field>
             <v-btn
-              v-else-if="recipe.orgURL"
+              v-else-if="recipe.orgURL && !cookModeToggle"
               dense
               small
               :hover="false"
@@ -454,12 +440,13 @@
     >
       <v-switch v-model="wakeLock" small label="Keep Screen Awake" />
     </div>
+
     <RecipeComments
-      v-if="recipe && !recipe.settings.disableComments && !form"
+      v-if="recipe && !recipe.settings.disableComments && !form && !cookModeToggle"
       v-model="recipe.comments"
       :slug="recipe.slug"
       :recipe-id="recipe.id"
-      class="px-1 my-4"
+      class="px-1 my-4 d-print-none"
     />
     <RecipePrintView v-if="recipe" :recipe="recipe" />
   </v-container>
@@ -478,12 +465,10 @@ import {
   useRouter,
   onMounted,
 } from "@nuxtjs/composition-api";
-// @ts-ignore vue-markdown has no types
-import VueMarkdown from "@adapttive/vue-markdown";
 import draggable from "vuedraggable";
 import { invoke, until, useWakeLock } from "@vueuse/core";
 import { onUnmounted } from "vue-demi";
-import RecipeCategoryTagSelector from "@/components/Domain/Recipe/RecipeCategoryTagSelector.vue";
+import RecipeOrganizerSelector from "@/components/Domain/Recipe/RecipeOrganizerSelector.vue";
 import RecipeDialogBulkAdd from "@/components/Domain/Recipe//RecipeDialogBulkAdd.vue";
 import { useUserApi, useStaticRoutes } from "~/composables/api";
 import { validators } from "~/composables/use-validators";
@@ -497,15 +482,16 @@ import RecipeNutrition from "~/components/Domain/Recipe/RecipeNutrition.vue";
 import RecipeInstructions from "~/components/Domain/Recipe/RecipeInstructions.vue";
 import RecipeNotes from "~/components/Domain/Recipe/RecipeNotes.vue";
 import RecipeImageUploadBtn from "~/components/Domain/Recipe/RecipeImageUploadBtn.vue";
+import RecipeScaleEditButton from "~/components/Domain/Recipe/RecipeScaleEditButton.vue";
 import RecipeSettingsMenu from "~/components/Domain/Recipe/RecipeSettingsMenu.vue";
 import RecipeIngredientEditor from "~/components/Domain/Recipe/RecipeIngredientEditor.vue";
 import RecipePrintView from "~/components/Domain/Recipe/RecipePrintView.vue";
 import RecipeTools from "~/components/Domain/Recipe/RecipeTools.vue";
 import RecipeComments from "~/components/Domain/Recipe/RecipeComments.vue";
-import { Recipe, RecipeTool } from "~/types/api-types/recipe";
+import { Recipe } from "~/types/api-types/recipe";
 import { uuid4, deepCopy } from "~/composables/use-utils";
 import { useRouteQuery } from "~/composables/use-router";
-
+import { useToolStore } from "~/composables/store";
 export default defineComponent({
   components: {
     draggable,
@@ -515,7 +501,7 @@ export default defineComponent({
         return import(/* webpackChunkName: "RecipeAssets" */ "~/components/Domain/Recipe/RecipeAssets.vue");
       }
     },
-    RecipeCategoryTagSelector,
+    RecipeOrganizerSelector,
     RecipeChips,
     RecipeComments,
     RecipeDialogBulkAdd,
@@ -530,7 +516,7 @@ export default defineComponent({
     RecipeSettingsMenu,
     RecipeTimeCard,
     RecipeTools,
-    VueMarkdown,
+    RecipeScaleEditButton,
   },
   async beforeRouteLeave(_to, _from, next) {
     const isSame = JSON.stringify(this.recipe) === JSON.stringify(this.originalRecipe);
@@ -606,6 +592,8 @@ export default defineComponent({
     const state = reactive({
       form: false,
       scale: 1,
+      scaleTemp: 1,
+      scaleDialog: false,
       hideImage: false,
       imageKey: 1,
       skeleton: false,
@@ -615,6 +603,7 @@ export default defineComponent({
         search: false,
         mainMenuBar: false,
       },
+      cookModeToggle: false,
     });
 
     const { recipe, loading, fetchRecipe } = useRecipe(slug);
@@ -653,6 +642,12 @@ export default defineComponent({
 
     // ===========================================================================
     // Button Click Event Handlers
+
+    function toggleEdit() {
+      state.jsonEditor = false;
+      state.cookModeToggle = false;
+      state.form = true;
+    }
 
     async function updateRecipe(slug: string, recipe: Recipe) {
       const { data } = await api.recipes.updateOne(slug, recipe);
@@ -697,13 +692,26 @@ export default defineComponent({
       return recipe.value?.recipeYield;
     });
 
+    const basicYield = computed(() => {
+      const regMatchNum = /\d+/;
+      const yieldString = recipe.value?.recipeYield;
+      const num = yieldString?.match(regMatchNum);
+
+      if (num && num?.length > 0) {
+        const yieldAsInt = parseInt(num[0]);
+        return yieldString?.replace(num[0], String(yieldAsInt));
+      }
+
+      return recipe.value?.recipeYield;
+    });
+
     async function uploadImage(fileObject: File) {
       if (!recipe.value || !recipe.value.slug) {
         return;
       }
       const newVersion = await api.recipes.updateImage(recipe.value.slug, fileObject);
-      if (newVersion?.data?.version) {
-        recipe.value.image = newVersion.data.version;
+      if (newVersion?.data?.image) {
+        recipe.value.image = newVersion.data.image;
       }
       state.imageKey++;
     }
@@ -757,18 +765,7 @@ export default defineComponent({
     // ===============================================================
     // Recipe Tools
 
-    async function updateTool(tool: RecipeTool) {
-      if (tool.id === undefined) return;
-
-      const { response } = await api.tools.updateOne(tool.id, tool);
-
-      if (response?.status === 200) {
-        console.log("Update Successful");
-      }
-    }
-
-    // ===============================================================
-    // Recipe API Extras
+    const toolStore = useToolStore();
 
     const apiNewKey = ref("");
 
@@ -837,6 +834,13 @@ export default defineComponent({
 
     const drag = ref(false);
 
+    // ===============================================================
+    // Scale
+
+    const setScale = (newScale: number) => {
+      state.scale = newScale;
+    };
+
     return {
       // Wake Lock
       drag,
@@ -854,22 +858,25 @@ export default defineComponent({
       enableLandscape,
       imageHeight,
       scaledYield,
+      basicYield,
       toggleJson,
       ...toRefs(state),
       recipe,
       api,
       loading,
       addStep,
+      setScale,
       deleteRecipe,
       printRecipe,
       closeEditor,
-      updateTool,
+      toggleEdit,
       updateRecipe,
       uploadImage,
       validators,
       recipeImage,
       addIngredient,
       removeApiExtra,
+      toolStore,
     };
   },
   head: {},

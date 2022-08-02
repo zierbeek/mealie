@@ -14,11 +14,54 @@
         </v-icon>
         {{ $vuetify.breakpoint.xsOnly ? null : $t("general.random") }}
       </v-btn>
+
       <v-menu v-if="$listeners.sort" offset-y left>
         <template #activator="{ on, attrs }">
           <v-btn text :icon="$vuetify.breakpoint.xsOnly" v-bind="attrs" :loading="sortLoading" v-on="on">
             <v-icon :left="!$vuetify.breakpoint.xsOnly">
               {{ $globals.icons.sort }}
+            </v-icon>
+            {{ $vuetify.breakpoint.xsOnly ? null : $t("general.sort") }}
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click="sortRecipesFrontend(EVENTS.az)">
+            <v-icon left>
+              {{ $globals.icons.orderAlphabeticalAscending }}
+            </v-icon>
+            <v-list-item-title>{{ $t("general.sort-alphabetically") }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="sortRecipesFrontend(EVENTS.rating)">
+            <v-icon left>
+              {{ $globals.icons.star }}
+            </v-icon>
+            <v-list-item-title>{{ $t("general.rating") }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="sortRecipesFrontend(EVENTS.created)">
+            <v-icon left>
+              {{ $globals.icons.newBox }}
+            </v-icon>
+            <v-list-item-title>{{ $t("general.created") }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="sortRecipesFrontend(EVENTS.updated)">
+            <v-icon left>
+              {{ $globals.icons.update }}
+            </v-icon>
+            <v-list-item-title>{{ $t("general.updated") }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="sortRecipesFrontend(EVENTS.shuffle)">
+            <v-icon left>
+              {{ $globals.icons.shuffleVariant }}
+            </v-icon>
+            <v-list-item-title>{{ $t("general.shuffle") }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+      <v-menu v-if="$listeners.sortRecipes" offset-y left>
+        <template #activator="{ on, attrs }">
+          <v-btn text :icon="$vuetify.breakpoint.xsOnly" v-bind="attrs" :loading="sortLoading" v-on="on">
+            <v-icon :left="!$vuetify.breakpoint.xsOnly">
+              {{ preferences.sortIcon }}
             </v-icon>
             {{ $vuetify.breakpoint.xsOnly ? null : $t("general.sort") }}
           </v-btn>
@@ -48,17 +91,22 @@
             </v-icon>
             <v-list-item-title>{{ $t("general.updated") }}</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="sortRecipes(EVENTS.shuffle)">
-            <v-icon left>
-              {{ $globals.icons.shuffleVariant }}
-            </v-icon>
-            <v-list-item-title>{{ $t("general.shuffle") }}</v-list-item-title>
-          </v-list-item>
         </v-list>
       </v-menu>
+      <ContextMenu
+        v-if="!$vuetify.breakpoint.xsOnly"
+        :items="[
+          {
+            title: 'Toggle View',
+            icon: $globals.icons.eye,
+            event: 'toggle-dense-view',
+          },
+        ]"
+        @toggle-dense-view="toggleMobileCards()"
+      />
     </v-app-bar>
     <div v-if="recipes" class="mt-2">
-      <v-row v-if="!viewScale">
+      <v-row v-if="!useMobileCards">
         <v-col v-for="(recipe, index) in recipes" :key="recipe.slug + index" :sm="6" :md="6" :lg="4" :xl="3">
           <v-lazy>
             <RecipeCard
@@ -99,17 +147,38 @@
         </v-col>
       </v-row>
     </div>
+    <div v-if="usePagination">
+      <v-card v-intersect="infiniteScroll"></v-card>
+      <v-fade-transition>
+        <AppLoader v-if="loading" :loading="loading" />
+      </v-fade-transition>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, useContext, useRouter } from "@nuxtjs/composition-api";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  toRefs,
+  useAsync,
+  useContext,
+  useRouter,
+} from "@nuxtjs/composition-api";
+import { useThrottleFn } from "@vueuse/core";
 import RecipeCard from "./RecipeCard.vue";
 import RecipeCardMobile from "./RecipeCardMobile.vue";
-import { useSorter } from "~/composables/recipes";
-import {Recipe} from "~/types/api-types/recipe";
+import { useAsyncKey } from "~/composables/use-utils";
+import { useLazyRecipes, useSorter } from "~/composables/recipes";
+import { Recipe } from "~/types/api-types/recipe";
+import { useUserSortPreferences } from "~/composables/use-users/preferences";
 
 const SORT_EVENT = "sort";
+const REPLACE_RECIPES_EVENT = "replaceRecipes";
+const APPEND_RECIPES_EVENT = "appendRecipes";
 
 export default defineComponent({
   components: {
@@ -129,10 +198,6 @@ export default defineComponent({
       type: String,
       default: null,
     },
-    mobileCards: {
-      type: Boolean,
-      default: false,
-    },
     singleColumn: {
       type: Boolean,
       default: false,
@@ -141,8 +206,14 @@ export default defineComponent({
       type: Array as () => Recipe[],
       default: () => [],
     },
+    usePagination: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props, context) {
+    const preferences = useUserSortPreferences();
+
     const utils = useSorter();
 
     const EVENTS = {
@@ -154,8 +225,8 @@ export default defineComponent({
     };
 
     const { $globals, $vuetify } = useContext();
-    const viewScale = computed(() => {
-      return props.mobileCards || $vuetify.breakpoint.smAndDown;
+    const useMobileCards = computed(() => {
+      return $vuetify.breakpoint.smAndDown || preferences.value.useMobileCards;
     });
 
     const displayTitleIcon = computed(() => {
@@ -164,7 +235,7 @@ export default defineComponent({
 
     const state = reactive({
       sortLoading: false,
-    })
+    });
 
     const router = useRouter();
     function navigateRandom() {
@@ -176,7 +247,114 @@ export default defineComponent({
       }
     }
 
+    const page = ref(1);
+    const perPage = ref(30);
+    const hasMore = ref(true);
+    const ready = ref(false);
+    const loading = ref(false);
+
+    const { fetchMore } = useLazyRecipes();
+
+    onMounted(async () => {
+      if (props.usePagination) {
+        const newRecipes = await fetchMore(
+          page.value,
+          perPage.value,
+          preferences.value.orderBy,
+          preferences.value.orderDirection
+        );
+        context.emit(REPLACE_RECIPES_EVENT, newRecipes);
+        ready.value = true;
+      }
+    });
+
+    const infiniteScroll = useThrottleFn(() => {
+      useAsync(async () => {
+        if (!ready.value || !hasMore.value || loading.value) {
+          return;
+        }
+
+        loading.value = true;
+        page.value = page.value + 1;
+
+        const newRecipes = await fetchMore(
+          page.value,
+          perPage.value,
+          preferences.value.orderBy,
+          preferences.value.orderDirection
+        );
+        if (!newRecipes.length) {
+          hasMore.value = false;
+        } else {
+          context.emit(APPEND_RECIPES_EVENT, newRecipes);
+        }
+
+        loading.value = false;
+      }, useAsyncKey());
+    }, 500);
+
+    /**
+     * sortRecipes helps filter using the API. This will eventually replace the sortRecipesFrontend function which pulls all recipes
+     * (without pagination) and does the sorting in the frontend.
+     * TODO: remove sortRecipesFrontend and remove duplicate "sortRecipes" section in the template (above)
+     * @param sortType
+     */
     function sortRecipes(sortType: string) {
+      if (state.sortLoading || loading.value) {
+        return;
+      }
+
+      function setter(orderBy: string, ascIcon: string, descIcon: string) {
+        if (preferences.value.orderBy !== orderBy) {
+          preferences.value.orderBy = orderBy;
+          preferences.value.orderDirection = "asc";
+        } else {
+          preferences.value.orderDirection = preferences.value.orderDirection === "asc" ? "desc" : "asc";
+        }
+        preferences.value.sortIcon = preferences.value.orderDirection === "asc" ? ascIcon : descIcon;
+      }
+
+      switch (sortType) {
+        case EVENTS.az:
+          setter("name", $globals.icons.sortAlphabeticalAscending, $globals.icons.sortAlphabeticalDescending);
+          break;
+        case EVENTS.rating:
+          setter("rating", $globals.icons.sortAscending, $globals.icons.sortDescending);
+          break;
+        case EVENTS.created:
+          setter("created_at", $globals.icons.sortCalendarAscending, $globals.icons.sortCalendarDescending);
+          break;
+        case EVENTS.updated:
+          setter("updated_at", $globals.icons.sortClockAscending, $globals.icons.sortClockDescending);
+          break;
+        default:
+          console.log("Unknown Event", sortType);
+          return;
+      }
+
+      useAsync(async () => {
+        // reset pagination
+        page.value = 1;
+        hasMore.value = true;
+
+        state.sortLoading = true;
+        loading.value = true;
+
+        // fetch new recipes
+        const newRecipes = await fetchMore(
+          page.value,
+          perPage.value,
+          preferences.value.orderBy,
+          preferences.value.orderDirection
+        );
+        context.emit(REPLACE_RECIPES_EVENT, newRecipes);
+
+        state.sortLoading = false;
+        loading.value = false;
+      }, useAsyncKey());
+    }
+
+    function sortRecipesFrontend(sortType: string) {
       state.sortLoading = true;
       const sortTarget = [...props.recipes];
       switch (sortType) {
@@ -203,13 +381,22 @@ export default defineComponent({
       state.sortLoading = false;
     }
 
+    function toggleMobileCards() {
+      preferences.value.useMobileCards = !preferences.value.useMobileCards;
+    }
+
     return {
       ...toRefs(state),
-      EVENTS,
-      viewScale,
       displayTitleIcon,
+      EVENTS,
+      infiniteScroll,
+      loading,
       navigateRandom,
+      preferences,
       sortRecipes,
+      sortRecipesFrontend,
+      toggleMobileCards,
+      useMobileCards,
     };
   },
 });

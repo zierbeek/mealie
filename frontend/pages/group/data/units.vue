@@ -6,12 +6,43 @@
         Combining the selected units will merge the Source Unit and Target Unit into a single unit. The
         <strong> Source Unit will be deleted </strong> and all of the references to the Source Unit will be updated to
         point to the Target Unit.
-        <v-autocomplete v-model="fromUnit" return-object :items="units" item-text="name" label="Source Unit" />
-        <v-autocomplete v-model="toUnit" return-object :items="units" item-text="name" label="Target Unit" />
+
+        <v-autocomplete v-model="fromUnit" return-object :items="units" item-text="id" label="Source Unit">
+          <template #selection="{ item }"> {{ item.name }}</template>
+          <template #item="{ item }"> {{ item.name }} </template>
+        </v-autocomplete>
+        <v-autocomplete v-model="toUnit" return-object :items="units" item-text="id" label="Target Unit">
+          <template #selection="{ item }"> {{ item.name }}</template>
+          <template #item="{ item }"> {{ item.name }} </template>
+        </v-autocomplete>
 
         <template v-if="canMerge && fromUnit && toUnit">
           <div class="text-center">Merging {{ fromUnit.name }} into {{ toUnit.name }}</div>
         </template>
+      </v-card-text>
+    </BaseDialog>
+
+    <!-- Create Dialog -->
+    <BaseDialog
+      v-model="createDialog"
+      :icon="$globals.icons.units"
+      title="Create Unit"
+      :submit-text="$tc('general.save')"
+      @submit="createUnit"
+    >
+      <v-card-text>
+        <v-form ref="domNewUnitForm">
+          <v-text-field
+            v-model="createTarget.name"
+            autofocus
+            label="Name"
+            :rules="[validators.required]"
+          ></v-text-field>
+          <v-text-field v-model="createTarget.abbreviation" label="Abbreviation"></v-text-field>
+          <v-text-field v-model="createTarget.description" label="Description"></v-text-field>
+          <v-checkbox v-model="createTarget.fraction" hide-details label="Display as Fraction"></v-checkbox>
+          <v-checkbox v-model="createTarget.useAbbreviation" hide-details label="Use Abbreviation"></v-checkbox>
+        </v-form>
       </v-card-text>
     </BaseDialog>
 
@@ -29,6 +60,7 @@
           <v-text-field v-model="editTarget.abbreviation" label="Abbreviation"></v-text-field>
           <v-text-field v-model="editTarget.description" label="Description"></v-text-field>
           <v-checkbox v-model="editTarget.fraction" hide-details label="Display as Fraction"></v-checkbox>
+          <v-checkbox v-model="editTarget.useAbbreviation" hide-details label="Use Abbreviation"></v-checkbox>
         </v-form>
       </v-card-text>
     </BaseDialog>
@@ -69,7 +101,7 @@
         >
           <template #item="{ item }">
             <v-list-item-content>
-              <v-list-item-title v-text="item.name"></v-list-item-title>
+              <v-list-item-title> {{ item.name }} </v-list-item-title>
               <v-list-item-subtitle>
                 {{ item.progress }}% {{ $tc("language-dialog.translated") }}
               </v-list-item-subtitle>
@@ -77,7 +109,7 @@
           </template>
         </v-autocomplete>
 
-        <v-alert v-if="units.length > 0" type="error" class="mb-0 text-body-2">
+        <v-alert v-if="units && units.length > 0" type="error" class="mb-0 text-body-2">
           {{ $t("data-pages.foods.seed-dialog-warning") }}
         </v-alert>
       </v-card-text>
@@ -88,16 +120,24 @@
     <CrudTable
       :table-config="tableConfig"
       :headers.sync="tableHeaders"
-      :data="units"
+      :data="units || []"
       :bulk-actions="[]"
       @delete-one="deleteEventHandler"
       @edit-one="editEventHandler"
+      @create-one="createEventHandler"
     >
       <template #button-row>
+        <BaseButton create @click="createDialog = true" />
+
         <BaseButton @click="mergeDialog = true">
           <template #icon> {{ $globals.icons.units }} </template>
           Combine
         </BaseButton>
+      </template>
+      <template #item.useAbbreviation="{ item }">
+        <v-icon :color="item.useAbbreviation ? 'success' : undefined">
+          {{ item.useAbbreviation ? $globals.icons.check : $globals.icons.close }}
+        </v-icon>
       </template>
       <template #item.fraction="{ item }">
         <v-icon :color="item.fraction ? 'success' : undefined">
@@ -119,9 +159,10 @@ import { computed, defineComponent, onMounted, ref } from "@nuxtjs/composition-a
 import type { LocaleObject } from "@nuxtjs/i18n";
 import { validators } from "~/composables/use-validators";
 import { useUserApi } from "~/composables/api";
-import { IngredientUnit } from "~/types/api-types/recipe";
-import { MultiPurposeLabelSummary } from "~/types/api-types/labels";
+import { CreateIngredientUnit, IngredientUnit } from "~/types/api-types/recipe";
 import { useLocales } from "~/composables/use-locales";
+import { useUnitStore } from "~/composables/store";
+import { VForm } from "~/types/vuetify";
 
 export default defineComponent({
   setup() {
@@ -147,9 +188,14 @@ export default defineComponent({
         show: true,
       },
       {
+        text: "Use Abbv.",
+        value: "useAbbreviation",
+        show: true,
+      },
+      {
         text: "Description",
         value: "description",
-        show: true,
+        show: false,
       },
       {
         text: "Fraction",
@@ -157,47 +203,75 @@ export default defineComponent({
         show: true,
       },
     ];
-    const units = ref<IngredientUnit[]>([]);
-    async function refreshUnits() {
-      const { data } = await userApi.units.getAll();
-      units.value = data ?? [];
-    }
-    onMounted(() => {
-      refreshUnits();
+
+    const { units, actions: unitActions } = useUnitStore();
+
+    // ============================================================
+    // Create Units
+
+    const createDialog = ref(false);
+    const domNewUnitForm = ref<VForm>();
+
+    // we explicitly set booleans to false since forms don't POST unchecked boxes
+    const createTarget = ref<CreateIngredientUnit>({
+      name: "",
+      fraction: false,
+      useAbbreviation: false,
     });
+
+    function createEventHandler() {
+      createDialog.value = true;
+    }
+
+    async function createUnit() {
+      if (!createTarget.value || !createTarget.value.name) {
+        return;
+      }
+
+      // @ts-expect-error the createOne function erroneously expects an id because it uses the IngredientUnit type
+      await unitActions.createOne(createTarget.value);
+      createDialog.value = false;
+
+      domNewUnitForm.value?.reset();
+      createTarget.value = {
+        name: "",
+        fraction: false,
+        useAbbreviation: false,
+      };
+    }
+
+    // ============================================================
+    // Edit Units
     const editDialog = ref(false);
     const editTarget = ref<IngredientUnit | null>(null);
     function editEventHandler(item: IngredientUnit) {
       editTarget.value = item;
       editDialog.value = true;
     }
+
     async function editSaveUnit() {
       if (!editTarget.value) {
         return;
       }
 
-      const { data } = await userApi.units.updateOne(editTarget.value.id, editTarget.value);
-      if (data) {
-        refreshUnits();
-      }
-
+      await unitActions.updateOne(editTarget.value);
       editDialog.value = false;
     }
+
+    // ============================================================
+    // Delete Units
     const deleteDialog = ref(false);
     const deleteTarget = ref<IngredientUnit | null>(null);
     function deleteEventHandler(item: IngredientUnit) {
       deleteTarget.value = item;
       deleteDialog.value = true;
     }
+
     async function deleteUnit() {
       if (!deleteTarget.value) {
         return;
       }
-
-      const { data } = await userApi.units.deleteOne(deleteTarget.value.id);
-      if (data) {
-        refreshUnits();
-      }
+      await unitActions.deleteOne(deleteTarget.value.id);
       deleteDialog.value = false;
     }
 
@@ -220,21 +294,9 @@ export default defineComponent({
       const { data } = await userApi.units.merge(fromUnit.value.id, toUnit.value.id);
 
       if (data) {
-        refreshUnits();
+        unitActions.refresh();
       }
     }
-
-    // ============================================================
-    // Labels
-
-    const allLabels = ref([] as MultiPurposeLabelSummary[]);
-
-    async function refreshLabels() {
-      const { data } = await userApi.multiPurposeLabels.getAll();
-      allLabels.value = data ?? [];
-    }
-
-    refreshLabels();
 
     // ============================================================
     // Seed
@@ -256,7 +318,7 @@ export default defineComponent({
       const { data } = await userApi.seeders.units({ locale: locale.value });
 
       if (data) {
-        refreshUnits();
+        unitActions.refresh();
       }
     }
 
@@ -264,8 +326,12 @@ export default defineComponent({
       tableConfig,
       tableHeaders,
       units,
-      allLabels,
       validators,
+      // Create
+      createDialog,
+      createEventHandler,
+      createUnit,
+      createTarget,
       // Edit
       editDialog,
       editEventHandler,

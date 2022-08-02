@@ -8,7 +8,7 @@
     "database-type": "Rodzaj bazy danych",
     "database-url": "URL bazy danych",
     "default-group": "Domyślna grupa",
-    "demo": "Demo",
+    "demo": "Wersja demonstracyjna",
     "demo-status": "Status demo",
     "development": "Wersja testowa",
     "docs": "Dokumentacja",
@@ -33,6 +33,7 @@
     "show-assets": "Wyświetl zasoby"
   },
   "category": {
+    "categories": "Kategorie",
     "category-created": "Kategoria stworzona",
     "category-creation-failed": "Błąd podczas tworzenia kategorii",
     "category-deleted": "Usunięto kategorię",
@@ -43,7 +44,7 @@
     "uncategorized-count": "Nieskategoryzowane {count}"
   },
   "events": {
-    "apprise-url": "Apprise URL",
+    "apprise-url": "URL Apprise",
     "database": "Baza danych",
     "delete-event": "Usuń wydarzenie",
     "new-notification-form-description": "Mealie używa biblioteki Apprise do generowania powiadomień. Oferują one wiele możliwości korzystania z usług do powiadomień. Zobacz ich wiki w celu uzyskania wyczerpującego poradnika jak utworzyć adres URL dla Twojej usługi. Jeśli jest to możliwe, wybór typu powiadomienia może zawierać dodatkowe funkcje.",
@@ -129,7 +130,11 @@
     "url": "URL",
     "view": "Widok",
     "wednesday": "Środa",
-    "yes": "Tak"
+    "yes": "Tak",
+    "foods": "Żywność",
+    "units": "Jednostki",
+    "back": "Cofnij",
+    "next": "Następny"
   },
   "group": {
     "are-you-sure-you-want-to-delete-the-group": "Czy na pewno chcesz usunąć <b>{groupName}<b/>?",
@@ -149,7 +154,11 @@
     "manage-groups": "Zarządzaj grupami",
     "user-group": "Grupa użytkownika",
     "user-group-created": "Utworzono grupę użytkowników",
-    "user-group-creation-failed": "Tworzenie grupy użytkowników nie powiodło się"
+    "user-group-creation-failed": "Tworzenie grupy użytkowników nie powiodło się",
+    "settings": {
+      "keep-my-recipes-private": "Zachowaj moje przepisy jako prywatne",
+      "keep-my-recipes-private-description": "Ustawia grupę i wszystkie przepisy jako prywatne. Opcję tą zawsze można później zmienić."
+    }
   },
   "meal-plan": {
     "create-a-new-meal-plan": "Utwórz nowy plan posiłku",
@@ -187,7 +196,7 @@
     "migration-data-removed": "Dane migracji usunięte",
     "nextcloud": {
       "description": "Przenieś dane z Nextcloud Cookbook",
-      "title": "Nextcloud Cookbook"
+      "title": "Książka kucharska Nextcloud"
     },
     "no-migration-data-available": "Brak danych do migracji",
     "recipe-migration": "Przenoszenie przepisów"
@@ -206,7 +215,10 @@
     "upload-a-recipe": "Wrzuć przepis",
     "upload-individual-zip-file": "Prześlij pojedynczy plik .zip wyeksportowany z innej instancji Mealie.",
     "url-form-hint": "Skopiuj i wklej link ze swojej ulubionej strony z przepisami",
-    "view-scraped-data": "Wyświetl zebrane dane"
+    "view-scraped-data": "Wyświetl zebrane dane",
+    "trim-whitespace-description": "Przytnij pustą przestrzeń przed i po zawartości oraz puste linie",
+    "trim-prefix-description": "Przytnij pierwszy znak z każdej linii",
+    "split-by-numbered-line-description": "Próbuj podzielić paragrafy poprzez dopasowanie po wzorcach '1)' i '1.'"
   },
   "page": {
     "404-page-not-found": "404. Nie znaleziono strony",
@@ -236,6 +248,7 @@
     "description": "Opis",
     "disable-amount": "Wyłącz ilości składników",
     "disable-comments": "Wyłącz komentarze",
+    "edit-scale": "Edytuj skalę",
     "fat-content": "Tłuszcz",
     "fiber-content": "Błonnik",
     "grams": "gram",
@@ -278,9 +291,7 @@
     "sugar-content": "Cukry",
     "title": "Tytuł",
     "total-time": "Czas całkowity",
-    "unable-to-delete-recipe": "Nie można usunąć przepisu"
-  },
-  "reicpe": {
+    "unable-to-delete-recipe": "Nie można usunąć przepisu",
     "no-recipe": "Brak przepisu"
   },
   "search": {
@@ -387,7 +398,8 @@
       "test-webhooks": "Testuj webhooki",
       "the-urls-listed-below-will-recieve-webhooks-containing-the-recipe-data-for-the-meal-plan-on-its-scheduled-day-currently-webhooks-will-execute-at": "Odnośniki poniżej otrzymają webhook zawierający dane o przepisie dla danego dnia. Aktualnie webhooki zostanę wykonane o",
       "webhook-url": "URL webhooka",
-      "webhooks-caps": "WEBHOOKI"
+      "webhooks-caps": "WEBHOOKI",
+      "webhooks": "Webhooki"
     }
   },
   "shopping-list": {
@@ -402,7 +414,9 @@
   },
   "sidebar": {
     "all-recipes": "Wszystkie",
+    "backups": "Kopie zapasowe",
     "categories": "Kategorie",
+    "cookbooks": "Książki kucharskie",
     "dashboard": "Kokpit",
     "home-page": "Strona główna",
     "manage-users": "Zarządzanie",
@@ -411,7 +425,8 @@
     "search": "Wyszukaj",
     "site-settings": "Ustawienia",
     "tags": "Tagi",
-    "toolbox": "Przybornik"
+    "toolbox": "Przybornik",
+    "language": "Język"
   },
   "signup": {
     "error-signing-up": "W trakcie rejestracji wystąpił błąd",
@@ -433,6 +448,9 @@
     "tags": "Tagi",
     "untagged-count": "{count} bez etykiety"
   },
+  "tool": {
+    "tools": "Narzędzia"
+  },
   "user": {
     "admin": "Administrator",
     "are-you-sure-you-want-to-delete-the-link": "Czy na pewno chcesz usunąć link <b>{link}<b/>?",
@@ -450,40 +468,83 @@
     "error-cannot-delete-super-user": "Wystąpił błąd! Nie można usunąć super użytkownika",
     "existing-password-does-not-match": "Aktualne hasło jest niezgodne",
     "full-name": "Imię i nazwisko",
+    "invite-only": "Tylko z zaproszeniem",
     "link-id": "ID linku",
     "link-name": "Nazwa linku",
-    "login": "Login",
+    "login": "Logowanie",
     "logout": "Wyloguj się",
     "manage-users": "Zarządzaj użytkownikami",
     "new-password": "Nowe Hasło",
     "new-user": "Nowy użytkownik",
-    "password": "Hasło",
     "password-has-been-reset-to-the-default-password": "Hasło zostało przywrócone do domyślnej wartości",
     "password-must-match": "Hasła muszą być takie same",
     "password-reset-failed": "Reset hasła nie powiódł się",
     "password-updated": "Hasło zostało zaktualizowane",
+    "password": "Hasło",
+    "password-strength": "Hasło jest {strength}",
+    "register": "Zarejestruj się",
     "reset-password": "Zresetuj hasło",
     "sign-in": "Zaloguj się",
     "total-mealplans": "Ilość planów posiłków",
     "total-users": "Ilość użytkowników",
     "upload-photo": "Prześlij zdjęcie",
     "use-8-characters-or-more-for-your-password": "Hasło musi składać się z 8 lub więcej znaków",
-    "user": "Użytkownik",
     "user-created": "Użytkownik został stworzony",
     "user-creation-failed": "Tworzenie użytkownika nie powiodło się",
     "user-deleted": "Użytkownik został usunięty",
-    "user-id": "ID użytkownika",
     "user-id-with-value": "ID użytkownika: {id}",
+    "user-id": "ID użytkownika",
     "user-password": "Hasło użytkownika",
     "user-successfully-logged-in": "Użytkownik został pomyślnie zalogowany",
     "user-update-failed": "Aktualizacja użytkownika nie powiodła się",
     "user-updated": "Użytkownik został zaktualizowany",
+    "user": "Użytkownik",
     "username": "Nazwa użytkownika",
-    "users": "Użytkownicy",
     "users-header": "UŻYTKOWNICY",
+    "users": "Użytkownicy",
     "webhook-time": "Czas webhooka",
     "webhooks-enabled": "Webhooki włączone",
     "you-are-not-allowed-to-create-a-user": "Nie masz uprawnień do tworzenia użytkowników",
-    "you-are-not-allowed-to-delete-this-user": "Nie masz uprawnień do usuwania użytkowników"
+    "you-are-not-allowed-to-delete-this-user": "Nie masz uprawnień do usuwania użytkowników",
+    "enable-advanced-content": "Włącz zaawansowane ustawienia",
+    "enable-advanced-content-description": "Włącza funkcje zaawansowane takie jak skalowanie przepisów, klucze API, webhooki i zarządzanie danymi. Nie mart się, opcję tą można później zmienić"
+  },
+  "language-dialog": {
+    "translated": "przetłumaczone",
+    "choose-language": "Wybierz język",
+    "select-description": "Wybierz język interfejsu Mealie. Ustawienie to wpływa tylko na Ciebie, nie na innych użytkowników.",
+    "how-to-contribute-description": "Czy coś jest nieprzetłumaczone, przetłumaczone w zły sposób bądź brakuje Twojego języka? {read-the-docs-link} jak wnieść swój wkład!",
+    "read-the-docs": "Przeczytaj dokumentację"
+  },
+  "data-pages": {
+    "seed-data": "Dane przykładowe",
+    "foods": {
+      "merge-dialog-text": "Połączenie wybranej żywności połączy źródło żywności i żywność docelową w pojedynczą żywność. Źródło żywności zostanie usunięte, a wszystkie odniesienia do źródłowej żywności zostaną zaktualizowane tak, aby wskazywały na docelową żywność.",
+      "merge-food-example": "Scalanie {food1} do {food2}",
+      "seed-dialog-text": "Wypełnij bazę daniami na podstawie wybranego lokalnego języka. Akcja ta stworzy ponad 200 zwyczajowych potraw które mogą zostać użyte do organizacji Twojej bazy. Potrawy tłumaczone są przez wysiłek społeczeństwa.",
+      "seed-dialog-warning": "Posiadasz już wartości w bazie. Rozwiązanie problemu z duplikatami leżeć będzie w gestii użytkownika."
+    },
+    "units": {
+      "seed-dialog-text": "Wypełnij bazę zwyczajowymi jednostkami dla wybranego języka."
+    },
+    "labels": {
+      "seed-dialog-text": "Wypełnij bazę zwyczajowymi etytkietami dla wybranego języka."
+    }
+  },
+  "user-registration": {
+    "user-registration": "Rejestracja użytkownika",
+    "join-a-group": "Dołącz do grupy",
+    "create-a-new-group": "Stwórz nową grupę",
+    "provide-registration-token-description": "Podaj kod rejestracyjny powiązany z grupą do której chcesz dołączyć. Taki kod uzyskać możesz od użytkownika który przynależy już do owej grupy.",
+    "group-details": "Szczegóły grupy",
+    "group-details-description": "Zanim utworzysz konto musisz stworzyć grupę. Twoja grupa zawierać będzie tylko Ciebie, ale będziesz istniała możlwiość zaproszenia do niej innych. Użytkownicy Twojej grupy mogą współdzielić plany posiłków, listy zakupów, przepisy i więcej!",
+    "use-seed-data": "Użyj przykładowych danych",
+    "use-seed-data-description": "Mealie dostarcza zestaw posiłków, jednostek i opisów które mogą zostać użyte do zapełnienia Twojej grupy przydatnymi danymi do ogranizacji Twoich przepisów.",
+    "account-details": "Szczegóły konta"
+  },
+  "validation": {
+    "group-name-is-taken": "Nazwa grupy jest zajęta",
+    "username-is-taken": "Nazwa użytkownika jest zajęta",
+    "email-is-taken": "Email jest zajęty"
   }
 }

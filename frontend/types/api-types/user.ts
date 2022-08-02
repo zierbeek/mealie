@@ -31,6 +31,9 @@ export interface CreateUserRegistration {
   seedData?: boolean;
   locale?: string;
 }
+export interface DeleteTokenResponse {
+  tokenDelete: string;
+}
 export interface ForgotPassword {
   email: string;
 }
@@ -62,9 +65,9 @@ export interface UserOut {
   cacheKey: string;
 }
 export interface LongLiveTokenOut {
+  token: string;
   name: string;
   id: number;
-  createdAt: string;
 }
 export interface ReadGroupPreferences {
   privateGroup?: boolean;
@@ -78,7 +81,7 @@ export interface ReadGroupPreferences {
   groupId: string;
   id: string;
 }
-export interface LoingLiveTokenIn {
+export interface LongLiveTokenIn {
   name: string;
 }
 export interface LongLiveTokenInDB {
@@ -163,6 +166,7 @@ export interface IngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
   id: string;
 }
 export interface CreateIngredientUnit {
@@ -170,6 +174,7 @@ export interface CreateIngredientUnit {
   description?: string;
   fraction?: boolean;
   abbreviation?: string;
+  useAbbreviation?: boolean;
 }
 export interface IngredientFood {
   name: string;

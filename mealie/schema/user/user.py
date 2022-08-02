@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 from uuid import UUID
@@ -12,27 +11,36 @@ from mealie.db.models.users import User
 from mealie.schema._mealie import MealieModel
 from mealie.schema.group.group_preferences import ReadGroupPreferences
 from mealie.schema.recipe import RecipeSummary
+from mealie.schema.response.pagination import PaginationBase
 
 from ..recipe import CategoryBase
 
 settings = get_app_settings()
 
 
-class LoingLiveTokenIn(MealieModel):
+class LongLiveTokenIn(MealieModel):
     name: str
 
 
-class LongLiveTokenOut(LoingLiveTokenIn):
+class LongLiveTokenOut(MealieModel):
+    token: str
+    name: str
     id: int
-    created_at: datetime
 
     class Config:
         orm_mode = True
 
 
-class CreateToken(LoingLiveTokenIn):
+class CreateToken(LongLiveTokenIn):
     user_id: UUID4
     token: str
+
+    class Config:
+        orm_mode = True
+
+
+class DeleteTokenResponse(MealieModel):
+    token_delete: str
 
     class Config:
         orm_mode = True
@@ -106,6 +114,10 @@ class UserOut(UserBase):
             }
 
 
+class UserPagination(PaginationBase):
+    items: list[UserOut]
+
+
 class UserFavorites(UserBase):
     favorite_recipes: list[RecipeSummary] = []  # type: ignore
 
@@ -171,6 +183,10 @@ class GroupInDB(UpdateGroup):
     @property
     def exports(self) -> Path:
         return GroupInDB.get_export_directory(self.id)
+
+
+class GroupPagination(PaginationBase):
+    items: list[GroupInDB]
 
 
 class LongLiveTokenInDB(CreateToken):

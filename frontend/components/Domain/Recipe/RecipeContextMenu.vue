@@ -81,7 +81,7 @@
       <v-list dense>
         <v-list-item v-for="(item, index) in menuItems" :key="index" @click="contextMenuEventHandler(item.event)">
           <v-list-item-icon>
-            <v-icon :color="item.color" v-text="item.icon"></v-icon>
+            <v-icon :color="item.color"> {{ item.icon }} </v-icon>
           </v-list-item-icon>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item>
@@ -95,8 +95,9 @@ import { defineComponent, reactive, toRefs, useContext, useRouter, ref } from "@
 import RecipeDialogShare from "./RecipeDialogShare.vue";
 import { useUserApi } from "~/composables/api";
 import { alert } from "~/composables/use-toast";
-import { MealType, planTypeOptions } from "~/composables/use-group-mealplan";
+import { planTypeOptions } from "~/composables/use-group-mealplan";
 import { ShoppingListSummary } from "~/types/api-types/group";
+import { PlanEntryType } from "~/types/api-types/meal-plan";
 import { useAxiosDownloader } from "~/composables/api/use-axios-download";
 
 export interface ContextMenuIncludes {
@@ -183,7 +184,7 @@ export default defineComponent({
       loading: false,
       menuItems: [] as ContextMenuItem[],
       newMealdate: "",
-      newMealType: "dinner" as MealType,
+      newMealType: "dinner" as PlanEntryType,
       pickerMenu: false,
     });
 
@@ -260,7 +261,7 @@ export default defineComponent({
     async function getShoppingLists() {
       const { data } = await api.shopping.lists.getAll();
       if (data) {
-        shoppingLists.value = data;
+        shoppingLists.value = data.items ?? [];
       }
     }
 
@@ -306,7 +307,7 @@ export default defineComponent({
     }
 
     // Note: Print is handled as an event in the parent component
-    const eventHandlers: { [key: string]: () => void } = {
+    const eventHandlers: { [key: string]: () => void | Promise<any> } = {
       delete: () => {
         state.recipeDeleteDialog = true;
       },

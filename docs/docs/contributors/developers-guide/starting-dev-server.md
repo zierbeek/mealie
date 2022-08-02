@@ -6,7 +6,7 @@
 
 After reading through the [Code Contributions Guide](../developers-guide/code-contributions.md) and forking the repo you can start working. This project is developed with :whale: docker and as such you will be greatly aided by using docker for development. It's not necessary but it is helpful.
 
-## With VS Code Dev Containers
+## With [VSCode Dev Containers](https://code.visualstudio.com/docs/remote/containers)
 
 Prerequisites
 
@@ -110,7 +110,7 @@ frontend             🎬 Start Mealie Frontend Development Server
 frontend-build       🏗  Build Frontend in frontend/dist
 frontend-generate    🏗  Generate Code for Frontend
 frontend-lint        🧺 Run yarn lint
-docker-dev           🐳 Build and Start Docker Development Stack
+docker-dev           🐳 Build and Start Docker Development Stack (currently not functional, see #756, #1072)
 docker-prod          🐳 Build and Start Docker Production Stack
 
 ```

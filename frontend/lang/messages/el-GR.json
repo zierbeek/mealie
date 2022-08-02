@@ -2,16 +2,16 @@
   "about": {
     "about": "Σχετικά με",
     "about-mealie": "Σχετικά με το Mealie",
-    "api-docs": "API Docs",
-    "api-port": "API Port",
+    "api-docs": "Έγγραφα API",
+    "api-port": "Θύρα API",
     "application-mode": "Κατάσταση εφαρμογής",
     "database-type": "Τύπος βάσης δεδομένων",
-    "database-url": "Database URL",
+    "database-url": "URL Βάσης Δεδομένων",
     "default-group": "Προεπιλεγμένη ομάδα",
     "demo": "Επίδειξη",
     "demo-status": "Κατάσταση επίδειξης",
     "development": "Ανάπτυξη",
-    "docs": "Docs",
+    "docs": "Έγγραφα",
     "download-log": "Λήψη αρχείου καταγραφής",
     "download-recipe-json": "Τελευταίο Scraped JSON",
     "github": "Github",
@@ -24,7 +24,7 @@
   },
   "asset": {
     "assets": "Στοιχεία",
-    "code": "Code",
+    "code": "Κώδικας",
     "file": "Αρχείο",
     "image": "Εικόνα",
     "new-asset": "Νέο Στοιχείο",
@@ -33,6 +33,7 @@
     "show-assets": "Εμφάνιση Στοιχείων"
   },
   "category": {
+    "categories": "Κατηγορίες",
     "category-created": "Δημιουργήθηκε η κατηγορία",
     "category-creation-failed": "Η δημιουργία κατηγορίας απέτυχε",
     "category-deleted": "Κατηγορία Διαγράφηκε",
@@ -68,7 +69,7 @@
     "dashboard": "Ταμπλό",
     "delete": "Διαγραφή",
     "disabled": "Ανενεργό",
-    "download": "Download",
+    "download": "Λήψη",
     "edit": "Επεξεργασία",
     "enabled": "Ενεργό",
     "exception": "Εξαίρεση",
@@ -129,7 +130,11 @@
     "url": "URL",
     "view": "Προβολη",
     "wednesday": "Τετάρτη",
-    "yes": "Ναι"
+    "yes": "Ναι",
+    "foods": "Φαγητά",
+    "units": "Μονάδες",
+    "back": "Πίσω",
+    "next": "Επόμενο"
   },
   "group": {
     "are-you-sure-you-want-to-delete-the-group": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό τον ασφαλή σύνδεσμο <b>{groupName}<b/>;",
@@ -149,7 +154,11 @@
     "manage-groups": "Διαχείριση Ομάδων",
     "user-group": "Ομάδες χρηστών",
     "user-group-created": "Η Ομάδα Χρηστών Δημιουργήθηκε",
-    "user-group-creation-failed": "Αποτυχία Δημιουργίας Ομάδας Χρηστών"
+    "user-group-creation-failed": "Αποτυχία Δημιουργίας Ομάδας Χρηστών",
+    "settings": {
+      "keep-my-recipes-private": "Κρατήστε Τις Συνταγές Μου Ιδιωτικές",
+      "keep-my-recipes-private-description": "Ορίζει την ομάδα σας και όλες τις συνταγές ιδιωτικές από προεπιλογή. Μπορείτε πάντα να το αλλάξετε αργότερα."
+    }
   },
   "meal-plan": {
     "create-a-new-meal-plan": "Δημιουργία νέου σχεδίου γεύματος",
@@ -197,7 +206,7 @@
     "error-details": "Μόνο ιστοσελίδες που περιέχουν ld+json ή μικροδεδομένα μπορούν να εισαχθούν από την Mealie. Οι πιο σημαντικές ιστοσελίδες συνταγών υποστηρίζουν αυτή τη δομή δεδομένων. Αν το site σας δεν μπορεί να εισαχθεί, αλλά υπάρχουν δεδομένα json στο αρχείο καταγραφής, παρακαλούμε να υποβάλετε ένα github πρόβλημα με το URL και τα δεδομένα.",
     "error-title": "Φαίνεται Όπως Δεν Μπορούσαμε Να βρούμε Οτιδήποτε",
     "from-url": "Εισαγωγή συνταγής",
-    "github-issues": "GitHub Issues",
+    "github-issues": "Σφάλματα GitHub",
     "google-ld-json-info": "Google ld+json Info",
     "must-be-a-valid-url": "Πρέπει να είναι ένα έγκυρο URL",
     "paste-in-your-recipe-data-each-line-will-be-treated-as-an-item-in-a-list": "Επικόλληση δεδομένων συνταγών σας. Κάθε γραμμή θα αντιμετωπίζεται ως αντικείμενο σε μια λίστα",
@@ -206,7 +215,10 @@
     "upload-a-recipe": "Ανεβάστε μια συνταγή",
     "upload-individual-zip-file": "Ανεβάστε ένα μεμονωμένο αρχείο .zip που εξάγεται από μια άλλη περίπτωση Mealie.",
     "url-form-hint": "Αντιγράψτε και επικολλήστε έναν σύνδεσμο από την αγαπημένη σας ιστοσελίδα συνταγών",
-    "view-scraped-data": "Προβολή Παραγόμενων Δεδομένων"
+    "view-scraped-data": "Προβολή Παραγόμενων Δεδομένων",
+    "trim-whitespace-description": "Περικοπή αιχμής και διαδρομής κενών καθώς και κενών γραμμών",
+    "trim-prefix-description": "Περικοπή πρώτου χαρακτήρα από κάθε γραμμή",
+    "split-by-numbered-line-description": "Προσπάθεια για χωρισμό μιας παραγράφου ταιριάζοντας μοτίβα '1)' ή '1'"
   },
   "page": {
     "404-page-not-found": "404. η σελίδα δεν βρέθηκε",
@@ -236,6 +248,7 @@
     "description": "Περιγραφή",
     "disable-amount": "Απενεργοποίηση Ποσών Συστατικών",
     "disable-comments": "Απενεργοποιηση σχολιων",
+    "edit-scale": "Επεξεργασία Κλίμακας",
     "fat-content": "Λιπαρά",
     "fiber-content": "Ίνα",
     "grams": "γραμμάρια",
@@ -278,9 +291,7 @@
     "sugar-content": "Ζάχαρη",
     "title": "Τίτλος",
     "total-time": "Συνολικός Χρόνος",
-    "unable-to-delete-recipe": "Αδυναμία διαγραφής συνταγής"
-  },
-  "reicpe": {
+    "unable-to-delete-recipe": "Αδυναμία διαγραφής συνταγής",
     "no-recipe": "Καμία Συνταγή"
   },
   "search": {
@@ -387,7 +398,8 @@
       "test-webhooks": "Δοκιμή Webhooks",
       "the-urls-listed-below-will-recieve-webhooks-containing-the-recipe-data-for-the-meal-plan-on-its-scheduled-day-currently-webhooks-will-execute-at": "Οι διευθύνσεις URL που παρατίθενται παρακάτω θα λαμβάνουν webhooks που περιέχουν τα δεδομένα συνταγών για το σχέδιο γεύματος την προγραμματισμένη ημέρα του",
       "webhook-url": "Webhook URL",
-      "webhooks-caps": "WEBHOOKS"
+      "webhooks-caps": "WEBHOOKS",
+      "webhooks": "Webhooks"
     }
   },
   "shopping-list": {
@@ -402,7 +414,9 @@
   },
   "sidebar": {
     "all-recipes": "Συνταγές όλες",
+    "backups": "Αντίγραφα ασφαλείας",
     "categories": "Κατηγορίες",
+    "cookbooks": "Μαγειρικά Βιβλία",
     "dashboard": "Ταμπλό",
     "home-page": "Αρχική Σελίδα",
     "manage-users": "Διαχ. χρηστών",
@@ -411,7 +425,8 @@
     "search": "Αναζήτηση",
     "site-settings": "Ρυθμ. site",
     "tags": "Ετικέτα",
-    "toolbox": "Εργαλειοθήκη"
+    "toolbox": "Εργαλειοθήκη",
+    "language": "Γλώσσα"
   },
   "signup": {
     "error-signing-up": "Σφάλμα Στην Υπογραφή",
@@ -433,6 +448,9 @@
     "tags": "Ετικέτες",
     "untagged-count": "Χωρίς ετικέτα {count}"
   },
+  "tool": {
+    "tools": "Εργαλεία"
+  },
   "user": {
     "admin": "Διαχειριστής",
     "are-you-sure-you-want-to-delete-the-link": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό τον ασφαλή σύνδεσμο <b>{link}<b/>;",
@@ -450,6 +468,7 @@
     "error-cannot-delete-super-user": "Σφάλμα! Αδυναμία Διαγραφής Υπερχρήστη",
     "existing-password-does-not-match": "Ο υπάρχων κωδικός πρόσβασης δεν ταιριάζει",
     "full-name": "Πλήρες όνομα",
+    "invite-only": "Μόνο με πρόσκληση",
     "link-id": "Σύνδεσμος ID",
     "link-name": "Όνομα συνδέσμου",
     "login": "Σύνδεση",
@@ -457,33 +476,75 @@
     "manage-users": "Διαχείριση χρηστών",
     "new-password": "Νέος Κωδικός",
     "new-user": "Νέος χρήστης",
-    "password": "Κωδικός",
     "password-has-been-reset-to-the-default-password": "Ο κωδικός πρόσβασης έχει επαναφερθεί στον προεπιλεγμένο κωδικό",
     "password-must-match": "Οι κωδικοί πρέπει να είναι ίδιοι",
     "password-reset-failed": "Αποτυχία επαναφοράς κωδικού πρόσβασης",
     "password-updated": "Ο κωδικός πρόσβασης ενημερώθηκε",
+    "password": "Κωδικός",
+    "password-strength": "Ο κωδικός είναι {strength}",
+    "register": "Εγγραφή",
     "reset-password": "Επαναφορά Κωδικού",
     "sign-in": "Είσοδος",
     "total-mealplans": "Σύνολο Σχεδίων Γεύματος",
     "total-users": "Σύνολο Χρηστών",
     "upload-photo": "Ανέβασμα φωτογραφίας",
     "use-8-characters-or-more-for-your-password": "Χρησιμοποιήστε 8 ή περισσότερους χαρακτήρες για τον κωδικό σας",
-    "user": "Χρήστης",
     "user-created": "Ο χρήστης δημιουργήθηκε",
     "user-creation-failed": "Απέτυχε η δημιουργία χρήστη",
     "user-deleted": "Ο χρήστης διαγράφηκε",
-    "user-id": "ID Χρήστη",
     "user-id-with-value": "ID χρήστη: {id}",
+    "user-id": "ID Χρήστη",
     "user-password": "Κωδικός Χρήστη",
     "user-successfully-logged-in": "Συνδεθήκατε επιτυχώς",
     "user-update-failed": "Αποτυχία ενημέρωσης χρήστη",
     "user-updated": "Ο χρήστης ενημερώθηκε",
+    "user": "Χρήστης",
     "username": "Όνομα Χρήστη",
-    "users": "Χρήστες",
     "users-header": "ΧΡΗΣΤΕΣ",
+    "users": "Χρήστες",
     "webhook-time": "Χρόνος Webhook",
     "webhooks-enabled": "Το webhook είναι ενεργό",
     "you-are-not-allowed-to-create-a-user": "Δεν επιτρέπεται να δημιουργήσετε ένα χρήστη",
-    "you-are-not-allowed-to-delete-this-user": "Δεν επιτρέπεται να διαγράψετε αυτόν τον χρήστη"
+    "you-are-not-allowed-to-delete-this-user": "Δεν επιτρέπεται να διαγράψετε αυτόν τον χρήστη",
+    "enable-advanced-content": "Ενεργοποίηση Προηγμένου Περιεχομένου",
+    "enable-advanced-content-description": "Ενεργοποιεί προηγμένες λειτουργίες όπως κλιμάκωση συνταγής, κλειδιά API, Webhooks και διαχείριση δεδομένων. Μην ανησυχείτε, μπορείτε πάντα να το αλλάξετε αργότερα"
+  },
+  "language-dialog": {
+    "translated": "μεταφρασμένο",
+    "choose-language": "Επιλογή γλώσσας",
+    "select-description": "Επιλέξτε τη γλώσσα για το περιβάλλον εργασίας εργασίας Mealie. Η ρύθμιση ισχύει μόνο για εσάς, όχι για άλλους χρήστες.",
+    "how-to-contribute-description": "Δεν είναι κάτι μεταφρασμένο ακόμα, λανθασμένο, ή η γλώσσα σας λείπει από τη λίστα? {read-the-docs-link} για το πώς να συνεισφέρει!",
+    "read-the-docs": "Διαβάστε τα έγγραφα"
+  },
+  "data-pages": {
+    "seed-data": "Seed Data",
+    "foods": {
+      "merge-dialog-text": "Ο συνδυασμός των επιλεγμένων τροφίμων θα συγχωνεύσει την πηγή τροφίμων και θα στοχεύσει τα τρόφιμα σε ένα μόνο φαγητό. Η πηγή τροφίμων θα διαγραφεί και όλες οι αναφορές στην πηγή τροφίμων θα ενημερωθούν ώστε να υποδείξουν το τρόφιμο-στόχο.",
+      "merge-food-example": "Συγχώνευση {food1} στο {food2}",
+      "seed-dialog-text": "Seed the database with foods based on your local language. This will create 200+ common foods that can be used to organize your database. Foods are translated via a community effort.",
+      "seed-dialog-warning": "You have already have some items in your database. This action will not reconcile duplicates, you will have to manage them manually."
+    },
+    "units": {
+      "seed-dialog-text": "Seed the database with common units based on your local language."
+    },
+    "labels": {
+      "seed-dialog-text": "Seed the database with common labels based on your local language."
+    }
+  },
+  "user-registration": {
+    "user-registration": "User Registration",
+    "join-a-group": "Join a Group",
+    "create-a-new-group": "Create a New Group",
+    "provide-registration-token-description": "Please provide the registration token associated with the group that you'd like to join. You'll need to obtain this from an existing group member.",
+    "group-details": "Group Details",
+    "group-details-description": "Before you create an account you'll need to create a group. Your group will only contain you, but you'll be able to invite others later. Members in your group can share meal plans, shopping lists, recipes, and more!",
+    "use-seed-data": "Use Seed Data",
+    "use-seed-data-description": "Mealie ships with a collection of Foods, Units, and Labels that can be used to populate your group with helpful data for organizing your recipes.",
+    "account-details": "Account Details"
+  },
+  "validation": {
+    "group-name-is-taken": "Group name is taken",
+    "username-is-taken": "Username is taken",
+    "email-is-taken": "Email is taken"
   }
 }

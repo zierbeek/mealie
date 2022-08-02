@@ -15,8 +15,9 @@ from mealie.db.models.recipe.settings import RecipeSettings
 from mealie.db.models.recipe.tag import Tag
 from mealie.db.models.recipe.tool import Tool
 from mealie.schema.recipe import Recipe
-from mealie.schema.recipe.recipe import RecipeCategory, RecipeSummary, RecipeTag, RecipeTool
+from mealie.schema.recipe.recipe import RecipeCategory, RecipePagination, RecipeSummary, RecipeTag, RecipeTool
 from mealie.schema.recipe.recipe_category import CategoryBase, TagBase
+from mealie.schema.response.pagination import PaginationQuery
 
 from .repository_generic import RepositoryGeneric
 
@@ -44,11 +45,11 @@ class RepositoryRecipes(RepositoryGeneric[Recipe, RecipeModel]):
         eff_schema = override_schema or self.schema
 
         if order_by:
-            order_attr = getattr(self.sql_model, str(order_by))
+            order_attr = getattr(self.model, str(order_by))
 
             return [
                 eff_schema.from_orm(x)
-                for x in self.session.query(self.sql_model)
+                for x in self.session.query(self.model)
                 .join(RecipeSettings)
                 .filter(RecipeSettings.public == True)  # noqa: 711
                 .order_by(order_attr.desc())
@@ -59,7 +60,7 @@ class RepositoryRecipes(RepositoryGeneric[Recipe, RecipeModel]):
 
         return [
             eff_schema.from_orm(x)
-            for x in self.session.query(self.sql_model)
+            for x in self.session.query(self.model)
             .join(RecipeSettings)
             .filter(RecipeSettings.public == True)  # noqa: 711
             .offset(start)
@@ -90,7 +91,9 @@ class RepositoryRecipes(RepositoryGeneric[Recipe, RecipeModel]):
             override_schema=override_schema,
         )
 
-    def summary(self, group_id, start=0, limit=99999, load_foods=False) -> Any:
+    def summary(
+        self, group_id, start=0, limit=99999, load_foods=False, order_by="created_at", order_descending=True
+    ) -> Any:
         args = [
             joinedload(RecipeModel.recipe_category),
             joinedload(RecipeModel.tags),
@@ -100,14 +103,63 @@ class RepositoryRecipes(RepositoryGeneric[Recipe, RecipeModel]):
         if load_foods:
             args.append(joinedload(RecipeModel.recipe_ingredient).options(joinedload(RecipeIngredient.food)))
 
+        try:
+            if order_by:
+                order_attr = getattr(RecipeModel, order_by)
+            else:
+                order_attr = RecipeModel.created_at
+
+        except AttributeError:
+            self.logger.info(f'Attempted to sort by unknown sort property "{order_by}"; ignoring')
+            order_attr = RecipeModel.created_at
+
+        if order_descending:
+            order_attr = order_attr.desc()
+
+        else:
+            order_attr = order_attr.asc()
+
         return (
             self.session.query(RecipeModel)
             .options(*args)
             .filter(RecipeModel.group_id == group_id)
-            .order_by(RecipeModel.date_added.desc())
+            .order_by(order_attr)
             .offset(start)
             .limit(limit)
             .all()
+        )
+
+    def page_all(self, pagination: PaginationQuery, override=None, load_food=False) -> RecipePagination:
+        q = self.session.query(self.model)
+
+        args = [
+            joinedload(RecipeModel.recipe_category),
+            joinedload(RecipeModel.tags),
+            joinedload(RecipeModel.tools),
+        ]
+
+        if load_food:
+            args.append(joinedload(RecipeModel.recipe_ingredient).options(joinedload(RecipeIngredient.food)))
+
+        q = q.options(*args)
+
+        fltr = self._filter_builder()
+        q = q.filter_by(**fltr)
+        q, count, total_pages = self.add_pagination_to_query(q, pagination)
+
+        try:
+            data = q.all()
+        except Exception as e:
+            self._log_exception(e)
+            self.session.rollback()
+            raise e
+
+        return RecipePagination(
+            page=pagination.page,
+            per_page=pagination.per_page,
+            total=count,
+            total_pages=total_pages,
+            items=data,
         )
 
     def get_by_categories(self, categories: list[RecipeCategory]) -> list[RecipeSummary]:
@@ -141,7 +193,7 @@ class RepositoryRecipes(RepositoryGeneric[Recipe, RecipeModel]):
         if categories:
             cat_ids = [x.id for x in categories]
             if require_all_categories:
-                fltr.extend(RecipeModel.recipe_category.any(Category.id.is_(cat_id)) for cat_id in cat_ids)
+                fltr.extend(RecipeModel.recipe_category.any(Category.id == cat_id) for cat_id in cat_ids)
             else:
                 fltr.append(RecipeModel.recipe_category.any(Category.id.in_(cat_ids)))
 
@@ -156,7 +208,7 @@ class RepositoryRecipes(RepositoryGeneric[Recipe, RecipeModel]):
             tool_ids = [x.id for x in tools]
 
             if require_all_tools:
-                fltr.extend(RecipeModel.tools.any(Tool.id.is_(tool_id)) for tool_id in tool_ids)
+                fltr.extend(RecipeModel.tags.any(Tag.id == tag_id) for tag_id in tag_ids)
             else:
                 fltr.append(RecipeModel.tools.any(Tool.id.in_(tool_ids)))
 
